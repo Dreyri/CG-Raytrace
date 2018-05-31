@@ -20,7 +20,7 @@ init:
 cache: c:\tools\vcpkg\installed
 
 before_build:
-- vcpkg install assimp:%arch%-windows catch2:%arch%-windows glm:%arch%-windows
+- vcpkg install assimp:%arch%-windows catch2:%arch%-windows glm:%arch%-windows qt5-base:%arch%-windows
 - mkdir build
 - cd build
 - cmake --version

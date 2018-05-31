@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(assimp REQUIRED)
 find_package(glm REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui REQUIRED)
 
 add_subdirectory(src)
 enable_testing()
