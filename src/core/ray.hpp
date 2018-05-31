@@ -1,5 +1,12 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 namespace rt {
-struct ray {};
+struct ray {
+  glm::vec3 origin;
+  glm::vec3 direction;
+
+  ray(const glm::vec3& origin, const glm::vec3& direction);
+};
 } // namespace rt
