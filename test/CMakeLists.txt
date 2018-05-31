@@ -1,5 +1,3 @@
-enable_testing()
-
 find_package(Catch2 REQUIRED)
 
 function(cg_add_test target)

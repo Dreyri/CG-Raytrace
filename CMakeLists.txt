@@ -8,4 +8,5 @@ find_package(assimp REQUIRED)
 find_package(glm REQUIRED)
 
 add_subdirectory(src)
+enable_testing()
 add_subdirectory(test)
