@@ -8,3 +8,4 @@ add_library(rtcore
             core/ray.cpp
             core/image.hpp
             core/ray.hpp)
+target_link_libraries(rtcore PRIVATE glm)
