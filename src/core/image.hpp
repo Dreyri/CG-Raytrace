@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <memory>
 
-#include <glm/glm.hpp>
-
 namespace rt {
 class image {
 public:
