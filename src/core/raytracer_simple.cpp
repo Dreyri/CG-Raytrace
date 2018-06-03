@@ -154,7 +154,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
         for (unsigned int w = 0; w < cam.imageWidth; w++)
         {
             rays[h][w].origin = cam.origin;
-            rays[h][w].direction = glm::normalize(cam.origin + cam.centerOfPixel(h, w));
+            rays[h][w].direction = glm::normalize(cam.centerOfPixel(h, w) - cam.origin);
         }
     }
 
@@ -168,7 +168,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
             {
                 if (RayIntersectsTriangle(rays[h][w].origin, rays[h][w].direction, poly, intersection))
                 {
-                    (*image)[h][w] = poly.color;
+                    (*image)[w][h] = poly.color;
                 }
             }
         }
