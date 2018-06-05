@@ -121,7 +121,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
     std::vector<Polygon> polygons = std::vector<Polygon>();
 
-    glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     model_transform = glm::scale(model_transform, glm::vec3(2.0f));
     model_transform = glm::translate(model_transform, glm::vec3(0.0f, 0.0f, 0.0f));
     
@@ -140,9 +140,9 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
     cam.position = glm::vec3(10.0f, 0.0f, 0.0f);
     cam.direction = glm::vec3(-1.0f, 0.0f, 0.0f);
     cam.height = 0.5f;
-    cam.width = cam.height * (float)(width/height);
-    cam.imageHeight = width;
-    cam.imageWidth = height;
+    cam.width = cam.height * ((float)width/(float)height);
+    cam.imageHeight = height;
+    cam.imageWidth = width;
     cam.fov = 90;
     cam.calculateDerived();
 
@@ -183,7 +183,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
             if (closestIndex != -1)
             {
-                (*image)[w][h] = polygons[closestIndex].color;
+                (*image)[h][w] = polygons[closestIndex].color;
             }            
         }
     }
