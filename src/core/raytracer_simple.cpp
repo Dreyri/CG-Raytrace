@@ -121,7 +121,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
     std::vector<Polygon> polygons = std::vector<Polygon>();
 
-    glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     model_transform = glm::scale(model_transform, glm::vec3(2.0f));
     model_transform = glm::translate(model_transform, glm::vec3(0.0f, 0.0f, 0.0f));
     
@@ -160,17 +160,31 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
     // ray <> triangle intersection
     glm::vec3* intersection = new glm::vec3(0.0);
+    glm::uvec3 color;
     for (unsigned int h = 0; h < cam.imageHeight; h++)
     {
         for (unsigned int w = 0; w < cam.imageWidth; w++)
         {
-            for (auto const poly : polygons)
+            float closestDistance = 99999999.0f;
+            unsigned int closestIndex = -1;
+
+            for (unsigned int p = 0; p < polygons.size(); p++)
             {
-                if (RayIntersectsTriangle(rays[h][w].origin, rays[h][w].direction, poly, intersection))
+                if (RayIntersectsTriangle(rays[h][w].origin, rays[h][w].direction, polygons[p], intersection))
                 {
-                    (*image)[w][h] = poly.color;
+                    float distance = glm::length(*intersection - rays[h][w].origin);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestIndex = p;
+                    }
                 }
             }
+
+            if (closestIndex != -1)
+            {
+                (*image)[w][h] = polygons[closestIndex].color;
+            }            
         }
     }
     delete intersection;
