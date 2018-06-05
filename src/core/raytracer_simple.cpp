@@ -121,9 +121,10 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
     std::vector<Polygon> polygons = std::vector<Polygon>();
 
-    glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    model_transform = glm::scale(model_transform, glm::vec3(2.0f));
-    model_transform = glm::translate(model_transform, glm::vec3(0.0f, 0.0f, 2.0f));
+    glm::mat4 model_rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 model_scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+    glm::mat4 model_position = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 4.0f));
+    glm::mat4 model_transform = model_position * model_scale * model_rotate;
     
     for (auto const indices : indexlist)
     {
