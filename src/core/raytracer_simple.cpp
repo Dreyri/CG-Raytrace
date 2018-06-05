@@ -137,9 +137,9 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
     }
 
     Camera cam = Camera();
-    cam.position = glm::vec3(10.0f, 0.0f, 0.0f);
-    cam.direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-    cam.height = 0.5f;
+    cam.position = glm::vec3(10.0f, 3.0f, 0.0f);
+    cam.direction = glm::normalize(glm::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
+    cam.height = 1.0f;
     cam.width = cam.height * ((float)width/(float)height);
     cam.imageHeight = height;
     cam.imageWidth = width;
