@@ -123,14 +123,14 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
     glm::mat4 model_transform = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     model_transform = glm::scale(model_transform, glm::vec3(2.0f));
-    model_transform = glm::translate(model_transform, glm::vec3(0.0f, 0.0f, 0.0f));
+    model_transform = glm::translate(model_transform, glm::vec3(0.0f, 0.0f, 2.0f));
     
     for (auto const indices : indexlist)
     {
         Polygon polygon = Polygon();
-        polygon.v1 = model_transform * glm::vec4(vertexlist[indices.x], 0.0f);
-        polygon.v2 = model_transform * glm::vec4(vertexlist[indices.y], 0.0f);
-        polygon.v3 = model_transform * glm::vec4(vertexlist[indices.z], 0.0f);
+        polygon.v1 = model_transform * glm::vec4(vertexlist[indices.x], 1.0f);
+        polygon.v2 = model_transform * glm::vec4(vertexlist[indices.y], 1.0f);
+        polygon.v3 = model_transform * glm::vec4(vertexlist[indices.z], 1.0f);
         polygon.color = mesh_color;
 
         polygons.push_back(polygon);
