@@ -67,6 +67,6 @@ trace_data tracer_sphere::trace(const rt::ray& r,
     }
   }
 
-  return {.distance = distance, .sphere = hit_sphere};
+  return {distance, hit_sphere};
 }
 } // namespace rt
