@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     auto rgbbuffer = tracer.render();
 
     QImage image = QImage(1920, 1080, QImage::Format::Format_RGB888);
-    
+
     for (unsigned int h = 0; h < 1080; h++)
     {
         for (unsigned int w = 0; w < 1920; w++)
