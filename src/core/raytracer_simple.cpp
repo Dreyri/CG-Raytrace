@@ -142,13 +142,13 @@ glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned in
 
     glm::vec3 lightVector = glm::normalize(light.position - intersection);
     glm::vec3 reflectVector = glm::normalize(2 * glm::dot(lightVector, normal) * normal - lightVector);
-    glm::vec3 viewVector = glm::normalize(viewRay.origin - intersection);
+    glm::vec3 viewVector = -1.0f * viewRay.direction;
 
     glm::vec3 a, d, s;
     a = poly.material->ambient * (ambient.intensity * ambient.color);
 
     float theta = glm::dot(lightVector, normal);
-    if (theta >= 0.0f && lightVisible(polygons, light, ray(intersection, lightVector)))
+    if (theta >= 0.0f && lightVisible(polygons, light, ray(intersection + (0.1f * lightVector), lightVector)))
     {
         d = poly.material->diffuse * theta * (light.intensity * light.color);
 
