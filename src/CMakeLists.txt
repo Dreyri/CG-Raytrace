@@ -9,5 +9,6 @@ add_library(rtcore
             core/scene.cpp
             core/sphere.cpp
             core/raytracer_simple.cpp
-            core/tracer_sphere.cpp)
+            core/tracer_sphere.cpp
+            core/boundingsphere.cpp)
 target_link_libraries(rtcore PRIVATE glm)
