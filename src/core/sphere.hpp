@@ -5,6 +5,8 @@
 namespace rt {
 struct sphere {
   // TODO: add material
+  glm::vec3 color{1.0f, 0.0f, 0.0f};
+
   glm::vec3 position;
   float radius;
 
