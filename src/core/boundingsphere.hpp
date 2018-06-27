@@ -12,12 +12,15 @@ struct vertex {
   glm::vec3 position;
   glm::vec3 normal;
   glm::vec4 color;
+  glm::vec2 texCoords;
 
   vertex(const glm::vec3& position, const glm::vec3& normal = glm::vec3(),
-         const glm::vec4& color = glm::vec4())
+         const glm::vec4& color = glm::vec4(),
+         const glm::vec2& texCoords = glm::vec2())
       : position{position}
       , normal{normal}
-      , color{color} {
+      , color{color}
+      , texCoords{texCoords} {
   }
 };
 
