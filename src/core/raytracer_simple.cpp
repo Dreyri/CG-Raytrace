@@ -2,60 +2,70 @@
 
 #include <iostream>
 
-using namespace rt;
+struct Ray
+{
+    glm::dvec3 origin;
+    glm::dvec3 direction;
+
+    Ray(glm::dvec3 origin, glm::dvec3 direction)
+    {
+        this->origin = origin;
+        this->direction = direction;
+    }
+};
 
 struct Light
 {
-    glm::vec3 position;
-    glm::vec3 color;
-    float intensity;
+    glm::dvec3 position;
+    glm::dvec3 color;
+    double intensity;
 };
 
 struct AmbientLight
 {
-    glm::vec3 color;
-    float intensity;
+    glm::dvec3 color;
+    double intensity;
 };
 
 struct Material
 {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
+    glm::dvec3 ambient;
+    glm::dvec3 diffuse;
+    glm::dvec3 specular;
+    double shininess;
 
     bool smoothed;
 };
 
 struct Polygon
 {
-    glm::vec3 v1, v2, v3;
-    glm::vec3 normal;
+    glm::dvec3 v1, v2, v3;
+    glm::dvec3 normal;
 
     std::shared_ptr<Material> material;
 };
 
 struct Camera
 {
-    glm::vec3 position;
-    glm::vec3 direction;
-    glm::vec3 up{0.0f, 1.0f, 0.0f};
-    float height, width;
+    glm::dvec3 position;
+    glm::dvec3 direction;
+    glm::dvec3 up{0.0, 1.0, 0.0};
+    double height, width;
     unsigned int imageHeight, imageWidth;
     unsigned int fov;
 
-    glm::vec3 origin;
-    glm::vec3 topLeft;
-    glm::vec3 stepPixelRight;
-    glm::vec3 stepPixelDown;
+    glm::dvec3 origin;
+    glm::dvec3 topLeft;
+    glm::dvec3 stepPixelRight;
+    glm::dvec3 stepPixelDown;
 
     void calculateDerived()
     {
         direction = glm::normalize(direction); // normalize view direction just in case
-        glm::vec3 toLeft = glm::cross(up, direction); // vector that points to the left in image plane
+        glm::dvec3 toLeft = glm::cross(up, direction); // vector that points to the left in image plane
 
         // origin point of eye behind image rectangle        
-        float n = -1.0 * ( (width / 2) / tan((float)fov / 2) );
+        double n = -1.0 * ( (width / 2) / tan((double)fov / 2) );
         origin = position + (n * direction);
         
         // top left corner of image rectangle
@@ -69,68 +79,75 @@ struct Camera
     }
 
     // 0,0 at top left, y points down, x to the right
-    glm::vec3 centerOfPixel(unsigned int y, unsigned int x)
+    glm::dvec3 centerOfPixel(unsigned int y, unsigned int x)
     {
-        return topLeft + ((float)x * stepPixelRight) + (0.5f * stepPixelRight) // x pixel to the right, starting with 0, add half a step to get to center of pixel
-                       + ((float)y * stepPixelDown) + (0.5f * stepPixelDown);  // y pixel down, starting with 0, add half a step to get to center of pixel
+        return topLeft + ((double)x * stepPixelRight) + (0.5 * stepPixelRight) // x pixel to the right, starting with 0, add half a step to get to center of pixel
+                       + ((double)y * stepPixelDown) + (0.5 * stepPixelDown);  // y pixel down, starting with 0, add half a step to get to center of pixel
     }
 };
 
-// https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-bool RayIntersectsTriangle(glm::vec3 rayOrigin, glm::vec3 rayVector, Polygon inTriangle, glm::vec3* outIntersectionPoint)
+bool RayIntersectsTriangle(Ray& ray, Polygon& poly, double& t, double& u, double& v, double& w)
 {
-    const float EPSILON = 0.0000001;
-    glm::vec3 vertex0 = inTriangle.v1;
-    glm::vec3 vertex1 = inTriangle.v2;
-    glm::vec3 vertex2 = inTriangle.v3;
-    glm::vec3 edge1, edge2, h, s, q;
-    float a, f, u, v;
-    edge1 = vertex1 - vertex0;
-    edge2 = vertex2 - vertex0;
-    h = glm::cross(rayVector, edge2);
-    a = glm::dot(edge1, h);
-    if (a > -EPSILON && a < EPSILON)
+    const double EPSILON = 0.0000001;
+
+    glm::dvec3 edge1 = poly.v2 - poly.v1;
+    glm::dvec3 edge2 = poly.v3 - poly.v1;
+    
+    glm::dvec3 h = glm::cross(ray.direction, edge2);
+    double det = glm::dot(edge1, h);
+    if (glm::abs(det) < EPSILON) // Ray parallel to triangle
+    {
         return false;
-    f = 1 / a;
-    s = rayOrigin - vertex0;
+    }
+
+    double f = 1 / det;
+    glm::dvec3 s = ray.origin - poly.v1;
     u = f * (glm::dot(s, h));
-    if (u < 0.0 || u > 1.0)
+    if (u < 0.0 || u > 1.0) // Point outside triangle area
+    {
         return false;
-    q = glm::cross(s, edge1);
-    v = f * glm::dot(rayVector, q);
-    if (v < 0.0 || u + v > 1.0)
+    }
+
+    glm::dvec3 q = glm::cross(s, edge1);
+    v = f * glm::dot(ray.direction, q);
+    if (v < 0.0 || u + v > 1.0)  // Point outside triangle area
+    {
         return false;
-    // At this stage we can compute t to find out where the intersection point is on the line.
-    float t = f * glm::dot(edge2, q);
+    }
+
+    // At this stage we can compute distance t to intersection point.
+    t = f * glm::dot(edge2, q);
+    w = 1.0 - u - v;
     if (t > EPSILON) // ray intersection
     {
-        *outIntersectionPoint = rayOrigin + rayVector * t;
+        //IntersectionPoint = rayOrigin + rayVector * t;
         return true;
     }
     else // This means that there is a line intersection but not a ray intersection.
+    {
         return false;
+    }
 }
 
-bool lightVisible(std::shared_ptr<std::vector<Polygon>> polygons, Light light, ray lightRay)
+bool lightVisible(std::shared_ptr<std::vector<Polygon>> polygons, Light light, Ray lightRay)
 {
-    glm::vec3* i = new glm::vec3();
-    for (auto const poly : *polygons)
+    double t, u, v, w;
+
+    for (auto poly : *polygons)
     {
-        if (RayIntersectsTriangle(lightRay.origin, lightRay.direction, poly, i))
+        if (RayIntersectsTriangle(lightRay, poly, t, u, v, w))
         {
-            delete i;
             return false;
         }
     }
-    delete i;
     return true;
 }
 
-glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned int polyIndex, Light light, AmbientLight ambient, ray viewRay, glm::vec3 intersection)
+glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned int polyIndex, Light light, AmbientLight ambient, Ray viewRay, glm::dvec3 intersection)
 {
     Polygon poly = (*polygons)[polyIndex];
 
-    glm::vec3 normal;
+    glm::dvec3 normal;
     if (poly.material->smoothed)
     {
         // Normale interpolieren
@@ -140,24 +157,24 @@ glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned in
         normal = poly.normal;
     }
 
-    glm::vec3 lightVector = glm::normalize(light.position - intersection);
-    glm::vec3 reflectVector = glm::normalize(2 * glm::dot(lightVector, normal) * normal - lightVector);
-    glm::vec3 viewVector = -1.0f * viewRay.direction;
+    glm::dvec3 lightVector = glm::normalize(light.position - intersection);
+    glm::dvec3 reflectVector = glm::normalize(2 * glm::dot(lightVector, normal) * normal - lightVector);
+    glm::dvec3 viewVector = -1.0 * viewRay.direction;
 
-    glm::vec3 a, d, s;
+    glm::dvec3 a, d, s;
     a = poly.material->ambient * (ambient.intensity * ambient.color);
 
-    float theta = glm::dot(lightVector, normal);
-    if (theta >= 0.0f && lightVisible(polygons, light, ray(intersection + (0.1f * lightVector), lightVector)))
+    double theta = glm::dot(lightVector, normal);
+    if (theta >= 0.0 && lightVisible(polygons, light, Ray(intersection + (0.1 * lightVector), lightVector)))
     {
         d = poly.material->diffuse * theta * (light.intensity * light.color);
 
-        float alpha = glm::dot(reflectVector, viewVector);
-        if (alpha >= 0.0f)
+        double alpha = glm::dot(reflectVector, viewVector);
+        if (alpha >= 0.0)
         {
             s = poly.material->specular * glm::pow(alpha, poly.material->shininess) * (light.intensity * light.color);
-            float x = glm::dot(reflectVector, viewVector);
-            float y = glm::pow(x, poly.material->shininess);
+            double x = glm::dot(reflectVector, viewVector);
+            double y = glm::pow(x, poly.material->shininess);
 
             return a + d + s;
         }
@@ -172,14 +189,14 @@ glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned in
     }
 }
 
-std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
+std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::render()
 {
     unsigned int height = 1080;
     unsigned int width = 1920;
 
     std::unique_ptr<std::vector<std::vector<glm::uvec3>>> image = std::make_unique<std::vector<std::vector<glm::uvec3>>>(height, std::vector<glm::uvec3>(width, {128, 128, 128}));
 
-    std::vector<glm::vec3> vertexList{
+    std::vector<glm::dvec3> vertexList{
         {-1.0, 1.0, 1.0},
         {-1.0, -1.0, 1.0},
         {1.0, -1.0, 1.0},
@@ -190,7 +207,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
         {-1.0, -1.0, -1.0},
     };
 
-    std::vector<glm::vec3> normalList{
+    std::vector<glm::dvec3> normalList{
         { 0.0, 0.0, 1.0 },
         { 1.0, 0.0, 0.0 },
         { 0.0, 1.0, 0.0 },
@@ -247,10 +264,10 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
     }
 
     Camera cam = Camera();
-    cam.position = glm::vec3(10.0f, 3.0f, 0.0f);
-    cam.direction = glm::normalize(glm::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
+    cam.position = glm::dvec3(10.0, 3.0, 0.0);
+    cam.direction = glm::normalize(glm::dvec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.height = 1.0f;
-    cam.width = cam.height * ((float)width/(float)height);
+    cam.width = cam.height * ((double)width/(double)height);
     cam.imageHeight = height;
     cam.imageWidth = width;
     cam.fov = 90;
@@ -261,11 +278,11 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
     ambient.intensity = 0.5f;
 
     Light light = Light();
-    light.position = glm::vec3(5.0f, 10.0f, 0.0f);
+    light.position = glm::dvec3(5.0f, 10.0f, 0.0f);
     light.color = glm::uvec3(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0f;
 
-    std::vector<std::vector<ray>> rays = std::vector<std::vector<ray>>(cam.imageHeight, std::vector<ray>(cam.imageWidth, ray(glm::vec3(0.0f), glm::vec3(0.0f))));
+    std::vector<std::vector<Ray>> rays = std::vector<std::vector<Ray>>(cam.imageHeight, std::vector<Ray>(cam.imageWidth, Ray(glm::dvec3(0.0), glm::dvec3(0.0))));
 
     // generate rays
     for (unsigned int h = 0; h < cam.imageHeight; h++)
@@ -278,19 +295,24 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
     }
 
     // ray <> triangle intersection
-    glm::vec3* intersection = new glm::vec3(0.0);
+    double distance, u, v, w;
+
     for (unsigned int h = 0; h < cam.imageHeight; h++)
     {
-        for (unsigned int w = 0; w < cam.imageWidth; w++)
+        for (unsigned int b = 0; b < cam.imageWidth; b++)
         {
-            float closestDistance = 99999999.0f;
+            double closestDistance = 99999999.0;
             unsigned int closestIndex = -1;
+
+            if (b == 750 && h == 650)
+            {
+                int abc = 1;
+            }
 
             for (unsigned int p = 0; p < polygons->size(); p++)
             {
-                if (RayIntersectsTriangle(rays[h][w].origin, rays[h][w].direction, (*polygons)[p], intersection))
+                if (RayIntersectsTriangle(rays[h][b], (*polygons)[p], distance, u, v, w))
                 {
-                    float distance = glm::length(*intersection - rays[h][w].origin);
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
@@ -301,18 +323,18 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> RaytracerSimple::render()
 
             if (closestIndex != -1)
             {
-                glm::vec3 ll = localLight(polygons, closestIndex, light, ambient, rays[h][w], *intersection);
+                glm::dvec3 intersection = rays[h][b].origin + rays[h][b].direction * closestDistance;
+                glm::vec3 ll = localLight(polygons, closestIndex, light, ambient, rays[h][b], intersection);
                 glm::uvec3 color = glm::uvec3();
 
                 color.r = 255 * ll.r;
                 color.g = 255 * ll.g;
                 color.b = 255 * ll.b;
 
-                (*image)[h][w] = color;
+                (*image)[h][b] = color;
             }            
         }
     }
-    delete intersection;
 
     return image;
 }
