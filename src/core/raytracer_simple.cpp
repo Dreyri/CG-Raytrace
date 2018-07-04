@@ -129,13 +129,12 @@ bool RayIntersectsTriangle(Ray& ray, Polygon& poly, double& t, double& u, double
     }
 }
 
-// returns -1 if no intersection, otherwise index of polygon
-// sets distance to intersection point
-// carries through u,v,w barycentric coordinates of intersection point
-unsigned int trace(std::vector<Polygon> polygons, Ray& ray, double& distance, double& u, double& v, double& w)
+// returns true if it hits an object, color
+bool trace(std::vector<Polygon> polygons, Ray& ray, Light& light, AmbientLight& ambient, glm::vec3& out_color)
 {
     double closestDistance = 99999999.0;
     unsigned int closestIndex = -1;
+    double distance, u, v, w;
 
     for (unsigned int p = 0; p < polygons.size(); p++)
     {
@@ -149,8 +148,17 @@ unsigned int trace(std::vector<Polygon> polygons, Ray& ray, double& distance, do
         }
     }
 
-    distance = closestDistance;
-    return closestIndex;
+    if (closestIndex != -1)
+    {
+        glm::dvec3 intersection = ray.origin + ray.direction * closestDistance;
+        out_color = localLight(polygons, closestIndex, light, ambient, ray, intersection);
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 // true if no obstruction along lightRay e.g. not in shadow
@@ -307,26 +315,22 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
     light.intensity = 1.0f;
 
     // ray <> triangle intersection
-    double distance, u, v, w;
-
     for (unsigned int h = 0; h < cam.imageHeight; h++)
     {
         for (unsigned int b = 0; b < cam.imageWidth; b++)
         {
             Ray ray = Ray(cam.origin, glm::normalize(cam.centerOfPixel(h, b) - cam.origin));
-            unsigned int polyIndex = trace(polygons, ray, distance, u, v, w);
 
-            if (polyIndex != -1)
+            glm::vec3 color;
+
+            if (trace(polygons, ray, light, ambient, color))
             {
-                glm::dvec3 intersection = ray.origin + ray.direction * distance;
-                glm::vec3 ll = localLight(polygons, polyIndex, light, ambient, ray, intersection);
-
-                target->setPixel(b, h, ll.r, ll.g, ll.b);
+                target->setPixel(b, h, color.r, color.g, color.b);
             }
             else
             {
                 target->setPixel(b, h, 0.5f, 0.5f, 0.5f);
-            }
+            }            
         }
     }
 }
