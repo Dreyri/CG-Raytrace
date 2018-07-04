@@ -129,6 +129,31 @@ bool RayIntersectsTriangle(Ray& ray, Polygon& poly, double& t, double& u, double
     }
 }
 
+// returns -1 if no intersection, otherwise index of polygon
+// sets distance to intersection point
+// carries through u,v,w barycentric coordinates of intersection point
+unsigned int trace(std::vector<Polygon> polygons, Ray& ray, double& distance, double& u, double& v, double& w)
+{
+    double closestDistance = 99999999.0;
+    unsigned int closestIndex = -1;
+
+    for (unsigned int p = 0; p < polygons.size(); p++)
+    {
+        if (RayIntersectsTriangle(ray, polygons[p], distance, u, v, w))
+        {
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = p;
+            }
+        }
+    }
+
+    distance = closestDistance;
+    return closestIndex;
+}
+
+// true if no obstruction along lightRay e.g. not in shadow
 bool lightVisible(std::vector<Polygon> polygons, Light& light, Ray& lightRay)
 {
     double t, u, v, w;
@@ -143,6 +168,7 @@ bool lightVisible(std::vector<Polygon> polygons, Light& light, Ray& lightRay)
     return true;
 }
 
+// local light model
 glm::vec3 localLight(std::vector<Polygon> polygons, unsigned int polyIndex, Light& light, AmbientLight& ambient, Ray& viewRay, glm::dvec3& intersection)
 {
     Polygon poly = polygons[polyIndex];
@@ -280,18 +306,6 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
     light.color = glm::uvec3(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0f;
 
-    std::vector<std::vector<Ray>> rays = std::vector<std::vector<Ray>>(cam.imageHeight, std::vector<Ray>(cam.imageWidth, Ray(glm::dvec3(0.0), glm::dvec3(0.0))));
-
-    // generate rays
-    for (unsigned int h = 0; h < cam.imageHeight; h++)
-    {
-        for (unsigned int w = 0; w < cam.imageWidth; w++)
-        {
-            rays[h][w].origin = cam.origin;
-            rays[h][w].direction = glm::normalize(cam.centerOfPixel(h, w) - cam.origin);
-        }
-    }
-
     // ray <> triangle intersection
     double distance, u, v, w;
 
@@ -299,30 +313,13 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
     {
         for (unsigned int b = 0; b < cam.imageWidth; b++)
         {
-            double closestDistance = 99999999.0;
-            unsigned int closestIndex = -1;
+            Ray ray = Ray(cam.origin, glm::normalize(cam.centerOfPixel(h, b) - cam.origin));
+            unsigned int polyIndex = trace(polygons, ray, distance, u, v, w);
 
-            if (b == 750 && h == 650)
+            if (polyIndex != -1)
             {
-                int abc = 1;
-            }
-
-            for (unsigned int p = 0; p < polygons.size(); p++)
-            {
-                if (RayIntersectsTriangle(rays[h][b], polygons[p], distance, u, v, w))
-                {
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        closestIndex = p;
-                    }
-                }
-            }
-
-            if (closestIndex != -1)
-            {
-                glm::dvec3 intersection = rays[h][b].origin + rays[h][b].direction * closestDistance;
-                glm::vec3 ll = localLight(polygons, closestIndex, light, ambient, rays[h][b], intersection);
+                glm::dvec3 intersection = ray.origin + ray.direction * distance;
+                glm::vec3 ll = localLight(polygons, polyIndex, light, ambient, ray, intersection);
 
                 target->setPixel(b, h, ll.r, ll.g, ll.b);
             }
