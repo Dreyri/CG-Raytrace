@@ -129,38 +129,6 @@ bool RayIntersectsTriangle(Ray& ray, Polygon& poly, double& t, double& u, double
     }
 }
 
-// returns true if it hits an object, color
-bool trace(std::vector<Polygon> polygons, Ray& ray, Light& light, AmbientLight& ambient, glm::vec3& out_color)
-{
-    double closestDistance = 99999999.0;
-    unsigned int closestIndex = -1;
-    double distance, u, v, w;
-
-    for (unsigned int p = 0; p < polygons.size(); p++)
-    {
-        if (RayIntersectsTriangle(ray, polygons[p], distance, u, v, w))
-        {
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestIndex = p;
-            }
-        }
-    }
-
-    if (closestIndex != -1)
-    {
-        glm::dvec3 intersection = ray.origin + ray.direction * closestDistance;
-        out_color = localLight(polygons, closestIndex, light, ambient, ray, intersection);
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 // true if no obstruction along lightRay e.g. not in shadow
 bool lightVisible(std::vector<Polygon> polygons, Light& light, Ray& lightRay)
 {
@@ -220,6 +188,38 @@ glm::vec3 localLight(std::vector<Polygon> polygons, unsigned int polyIndex, Ligh
     else
     {
         return a;
+    }
+}
+
+// returns true if it hits an object, color
+bool trace(std::vector<Polygon> polygons, Ray& ray, Light& light, AmbientLight& ambient, glm::vec3& out_color)
+{
+    double closestDistance = 99999999.0;
+    unsigned int closestIndex = -1;
+    double distance, u, v, w;
+
+    for (unsigned int p = 0; p < polygons.size(); p++)
+    {
+        if (RayIntersectsTriangle(ray, polygons[p], distance, u, v, w))
+        {
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = p;
+            }
+        }
+    }
+
+    if (closestIndex != -1)
+    {
+        glm::dvec3 intersection = ray.origin + ray.direction * closestDistance;
+        out_color = localLight(polygons, closestIndex, light, ambient, ray, intersection);
+
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -329,7 +329,7 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
             }
             else
             {
-                target->setPixel(b, h, 0.5f, 0.5f, 0.5f);
+                target->setPixel(b, h, 0.2f, 0.2f, 0.2f);
             }            
         }
     }
