@@ -129,11 +129,11 @@ bool RayIntersectsTriangle(Ray& ray, Polygon& poly, double& t, double& u, double
     }
 }
 
-bool lightVisible(std::shared_ptr<std::vector<Polygon>> polygons, Light light, Ray lightRay)
+bool lightVisible(std::vector<Polygon> polygons, Light& light, Ray& lightRay)
 {
     double t, u, v, w;
 
-    for (auto poly : *polygons)
+    for (auto poly : polygons)
     {
         if (RayIntersectsTriangle(lightRay, poly, t, u, v, w))
         {
@@ -143,9 +143,9 @@ bool lightVisible(std::shared_ptr<std::vector<Polygon>> polygons, Light light, R
     return true;
 }
 
-glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned int polyIndex, Light light, AmbientLight ambient, Ray viewRay, glm::dvec3 intersection)
+glm::vec3 localLight(std::vector<Polygon> polygons, unsigned int polyIndex, Light& light, AmbientLight& ambient, Ray& viewRay, glm::dvec3& intersection)
 {
-    Polygon poly = (*polygons)[polyIndex];
+    Polygon poly = polygons[polyIndex];
 
     glm::dvec3 normal;
     if (poly.material->smoothed)
@@ -189,12 +189,10 @@ glm::vec3 localLight(std::shared_ptr<std::vector<Polygon>> polygons, unsigned in
     }
 }
 
-std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::render()
+void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
 {
-    unsigned int height = 1080;
-    unsigned int width = 1920;
-
-    std::unique_ptr<std::vector<std::vector<glm::uvec3>>> image = std::make_unique<std::vector<std::vector<glm::uvec3>>>(height, std::vector<glm::uvec3>(width, {128, 128, 128}));
+    unsigned int height = target->getHeight();
+    unsigned int width = target->getWidth();
 
     std::vector<glm::dvec3> vertexList{
         {-1.0, 1.0, 1.0},
@@ -242,7 +240,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::rende
     material->shininess = 27.8974f;
     material->smoothed = false;
 
-    std::shared_ptr<std::vector<Polygon>> polygons = std::make_shared<std::vector<Polygon>>(std::vector<Polygon>());
+    std::vector<Polygon> polygons = std::vector<Polygon>();
 
     glm::mat4 model_rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 model_scale = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
@@ -260,7 +258,7 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::rende
 
         polygon.material = material;
 
-        polygons->push_back(polygon);
+        polygons.push_back(polygon);
     }
 
     Camera cam = Camera();
@@ -309,9 +307,9 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::rende
                 int abc = 1;
             }
 
-            for (unsigned int p = 0; p < polygons->size(); p++)
+            for (unsigned int p = 0; p < polygons.size(); p++)
             {
-                if (RayIntersectsTriangle(rays[h][b], (*polygons)[p], distance, u, v, w))
+                if (RayIntersectsTriangle(rays[h][b], polygons[p], distance, u, v, w))
                 {
                     if (distance < closestDistance)
                     {
@@ -325,16 +323,13 @@ std::unique_ptr<std::vector<std::vector<glm::uvec3>>> rt::RaytracerSimple::rende
             {
                 glm::dvec3 intersection = rays[h][b].origin + rays[h][b].direction * closestDistance;
                 glm::vec3 ll = localLight(polygons, closestIndex, light, ambient, rays[h][b], intersection);
-                glm::uvec3 color = glm::uvec3();
 
-                color.r = 255 * ll.r;
-                color.g = 255 * ll.g;
-                color.b = 255 * ll.b;
-
-                (*image)[h][b] = color;
-            }            
+                target->setPixel(b, h, ll.r, ll.g, ll.b);
+            }
+            else
+            {
+                target->setPixel(b, h, 0.5f, 0.5f, 0.5f);
+            }
         }
     }
-
-    return image;
 }
