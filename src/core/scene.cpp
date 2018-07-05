@@ -1,8 +1,5 @@
 #include "scene.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/geometric.hpp>
-
 using namespace rt;
 
 void Scene::transform()
@@ -11,9 +8,9 @@ void Scene::transform()
 
     for (Object& object : this->objects)
     {
-        mat4x4 model_rotate = glm::mat4_cast(object.rotation); //
-        mat4x4 model_scale = glm::scale(mat4x4(1.0), object.scale);
-        mat4x4 model_position = glm::translate(mat4x4(1.0), object.position);
+        mat4x4 model_rotate = object.getRotationMat();
+        mat4x4 model_scale = object.getScaleMat();
+        mat4x4 model_position = object.getTranslateMat();
         mat4x4 model_transform = model_position * model_scale * model_rotate;
 
         unsigned int first = this->polygons.size();

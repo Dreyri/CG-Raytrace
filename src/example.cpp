@@ -4,7 +4,6 @@
 
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <QWindow>
 #include <QImage>
 #include <QTime>
@@ -21,7 +20,7 @@ public:
     ImageTarget(std::shared_ptr<QImage> image) : image(image) {}
     unsigned int getWidth() override { return this->image->width(); }
     unsigned int getHeight() override { return this->image->height(); }
-    void setPixel(unsigned int w, unsigned int h, float r, float g, float b) override
+    void setPixel(unsigned int w, unsigned int h, rt::floating r, rt::floating g, rt::floating b) override
     {
         this->image->setPixelColor(w, h, { (int)(255 * r), (int)(255 * g), (int)(255 * b) });
     }
@@ -43,7 +42,7 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     ambient.intensity = 0.5;
 
     rt::Light light = rt::Light();
-    light.position = rt::vec3(5.0f, 10.0f, 0.0f);
+    light.position = rt::vec3(5.0, 10.0, 0.0);
     light.color = rt::fColor(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0;
 
@@ -61,10 +60,18 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     rt::Object box1 = rt::Object();
     box1.material = bronze;
     box1.mesh = rt::Mesh::getUnityCube();
-    box1.position = rt::vec3(0.0, 0.0, 4.0);
-    box1.scale = rt::vec3(2.0);
-    box1.rotation = glm::rotate(rt::quaternion(), glm::radians(45.0), rt::vec3(0.0, 1.0, 0.0));
+    box1.setPosition({0.0, 0.0, 4.0});
+    box1.setScale({ 2.0, 2.0, 2.0 });
+    box1.setRotation(45.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(box1);
+
+    rt::Object box2 = rt::Object();
+    box2.material = bronze;
+    box2.mesh = rt::Mesh::getUnityCube();
+    box2.setPosition({ 0.0, 0.0, -4.0 });
+    box2.setScale({ 2.0, 2.0, 2.0 });
+    box2.setRotation(-45.0, { 0.0, 1.0, 0.0 });
+    scene->objects.push_back(box2);
 }
 
 int main(int argc, char** argv)

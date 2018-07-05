@@ -19,7 +19,7 @@ namespace rt
     public:
         virtual unsigned int getWidth() = 0;
         virtual unsigned int getHeight() = 0;
-        virtual void setPixel(unsigned int w, unsigned int h, float r, float g, float b) = 0;
+        virtual void setPixel(unsigned int w, unsigned int h, floating r, floating g, floating b) = 0;
     };
 
     class Raytracer

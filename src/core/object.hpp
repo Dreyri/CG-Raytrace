@@ -19,6 +19,14 @@ namespace rt
         vec3 scale;
         quaternion rotation;
 
+        mat4x4 getRotationMat();
+        mat4x4 getScaleMat();
+        mat4x4 getTranslateMat();
+
+        void setRotation(floating degree, vec3 axis);
+        void setScale(vec3 scale);
+        void setPosition(vec3 position);
+
         unsigned int poly_first;
         unsigned int poly_last;
     };
