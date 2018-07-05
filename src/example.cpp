@@ -39,10 +39,10 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
 
     rt::AmbientLight ambient = rt::AmbientLight();
     ambient.color = rt::fColor(1.0f, 1.0f, 1.0f);
-    ambient.intensity = 0.5;
+    ambient.intensity = 0.8;
 
     rt::Light light = rt::Light();
-    light.position = rt::vec3(10.0, 10.0, 0.0);
+    light.position = rt::vec3(10.0, 5.0, 0.0);
     light.color = rt::fColor(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0;
 
@@ -57,6 +57,24 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     bronze->shininess = 27.8974;
     bronze->reflection_amount = 0.4;
     bronze->transparent = false;
+
+    std::shared_ptr<rt::Material> glass = std::make_shared<rt::Material>();
+    glass->ambient = { 0.1, 0.1, 0.1 };
+    glass->diffuse = { 0.19, 0.19, 0.19 };
+    glass->specular = { 0.2, 0.2, 0.2 };
+    glass->shininess = 50.0;
+    glass->reflection_amount = 0.3;
+    glass->transparent = true;
+    glass->refraction_amount = 0.7;
+    glass->refraction_index = 1.0;
+
+    std::shared_ptr<rt::Material> mirror = std::make_shared<rt::Material>();
+    mirror->ambient = { 0.1, 0.1, 0.1 };
+    mirror->diffuse = { 0.1, 0.1, 0.1 };
+    mirror->specular = { 0.1, 0.1, 0.1 };
+    mirror->shininess = 100.0;
+    mirror->reflection_amount = 0.9;
+    mirror->transparent = false;
 
     rt::Object box1 = rt::Object();
     box1.material = bronze;
@@ -73,6 +91,22 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     box2.setScale({ 2.0, 2.0, 2.0 });
     box2.setRotation(-45.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(box2);
+
+    rt::Object glass1 = rt::Object();
+    glass1.material = glass;
+    glass1.mesh = rt::Mesh::getUnityCube();
+    glass1.setPosition({ 4.0, 0.0, 4.0 });
+    glass1.setScale({0.1, 3.0, 3.0});
+    glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    //scene->objects.push_back(glass1);
+
+    rt::Object mirror1 = rt::Object();
+    mirror1.material = glass;
+    mirror1.mesh = rt::Mesh::getUnityCube();
+    mirror1.setPosition({ -5.0, 0.0, 4.0 });
+    mirror1.setScale({ 0.1, 8.0, 8.0 });
+    mirror1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    //scene->objects.push_back(mirror1);
 }
 
 int main(int argc, char** argv)
