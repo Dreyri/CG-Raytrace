@@ -29,10 +29,13 @@ namespace rt
     public:
         std::shared_ptr<Scene> scene;
 
+        unsigned int maxDepth = 10;
+        floating adaptiveDepth = 0.05;
+
         bool intersectTriangle(Ray& ray, Polygon& poly, floating& t, floating& u, floating& v, floating& w);       
         bool lightVisible(Ray& lightRay);
-        fColor localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w);
-        bool trace(Ray& ray, fColor& out_color);
+        fColor localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w, vec3& normal);
+        bool trace(Ray& ray, fColor& out_color, unsigned int depth, floating adpT);
         //bool intersectSphere(const ray& r, const sphere& sph);
 
         virtual void render(std::shared_ptr<rt::RenderTarget> target) = 0;

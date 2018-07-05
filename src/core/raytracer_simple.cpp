@@ -17,7 +17,7 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
 
             fColor color;
 
-            if (trace(ray, color))
+            if (trace(ray, color, 1, 1.0))
             {
                 target->setPixel(b, h, color.r, color.g, color.b);
             }

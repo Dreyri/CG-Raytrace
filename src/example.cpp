@@ -55,7 +55,8 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     bronze->diffuse = { 0.780392, 0.568627, 0.113725 };
     bronze->specular = { 0.992157, 0.941176, 0.807843 };
     bronze->shininess = 27.8974;
-    bronze->smoothed = false;
+    bronze->reflection_amount = 0.4;
+    bronze->transparent = false;
 
     rt::Object box1 = rt::Object();
     box1.material = bronze;

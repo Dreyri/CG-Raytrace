@@ -12,11 +12,9 @@ namespace rt
         floating shininess;
 
         bool transparent;
-        floating refraction_i;
+        floating refraction_index;
         floating refraction_amount;
 
         floating reflection_amount;
-
-        bool smoothed;
     };
 }

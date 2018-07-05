@@ -64,7 +64,7 @@ bool Raytracer::lightVisible(Ray& lightRay)
 }
 
 // local light model
-fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w)
+fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w, vec3& normal)
 {
     auto& polygons = this->scene->polygons;
     auto& light = this->scene->light;
@@ -73,7 +73,7 @@ fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& interse
     Polygon poly = polygons[polyIndex];
 
     vec3 viewVector = -1.0 * viewRay.direction;
-    vec3 normal = glm::normalize(poly.n1 * u + poly.n2 * v + poly.n3 * w);
+    normal = glm::normalize(poly.n1 * u + poly.n2 * v + poly.n3 * w);
 
     floating rev = glm::degrees(glm::acos(glm::dot(viewVector, normal)));
     if (rev >= 180.0)
@@ -112,9 +112,36 @@ fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& interse
     }
 }
 
-// returns true if it hits an object, color
-bool Raytracer::trace(Ray& ray, fColor& out_color)
+vec3 refract(vec3 view, vec3 normal, floating ior)
 {
+    floating cosi = glm::clamp(glm::dot(view, normal), -1.0, 1.0);
+    floating etai = 1, etat = ior;
+    vec3 n = normal;
+    
+    if (cosi < 0)
+    {
+        cosi = -cosi;
+    }
+    else
+    {
+        std::swap(etai, etat);
+        n = -normal; 
+    }
+    
+    floating eta = etai / etat;
+    floating k = 1 - eta * eta * (1 - cosi * cosi);
+
+    return k < 0.0 ? vec3(0.0) : eta * view + (eta * cosi - glm::sqrt(k)) * n;
+}
+
+// returns true if it hits an object, color
+bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating adpT)
+{
+    if (depth > this->maxDepth)
+    {
+        return false;
+    }
+
     auto& polygons = this->scene->polygons;
     auto& light = this->scene->light;
     auto& ambient = this->scene->ambient;
@@ -141,8 +168,29 @@ bool Raytracer::trace(Ray& ray, fColor& out_color)
 
     if (closestIndex != -1)
     {
+        vec3 normal;
+        fColor localColor;
         vec3 intersection = ray.origin + ray.direction * closestDistance;
-        out_color = localLight(closestIndex, ray, intersection, cu, cv, cw);
+        vec3 viewVector = ray.direction * -1.0;
+        localColor = localLight(closestIndex, ray, intersection, cu, cv, cw, normal);
+
+        fColor reflectColor(0.0);
+        floating adaptiveReflection = adpT * polygons[closestIndex].material->reflection_amount;
+        if (adaptiveReflection > this->adaptiveDepth)
+        {
+            vec3 reflectVector = glm::normalize(viewVector - 2 * glm::dot(viewVector, normal) * normal);
+            trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection);
+        }
+        
+        fColor refractColor(0.0);
+        floating adaptiveRefraction = adpT * polygons[closestIndex].material->refraction_amount;
+        if (adaptiveRefraction > this->adaptiveDepth)
+        {
+            vec3 refractVector = refract(viewVector, normal, polygons[closestIndex].material->refraction_index);
+            trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction);
+        }
+
+        out_color = glm::clamp(localColor + (polygons[closestIndex].material->reflection_amount * reflectColor) + (polygons[closestIndex].material->refraction_amount * refractColor), 0.0, 1.0);
 
         return true;
     }
