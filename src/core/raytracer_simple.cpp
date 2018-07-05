@@ -178,16 +178,16 @@ glm::vec3 localLight(std::vector<Polygon> polygons, unsigned int polyIndex, Ligh
             double x = glm::dot(reflectVector, viewVector);
             double y = glm::pow(x, poly.material->shininess);
 
-            return a + d + s;
+            return glm::clamp(a + d + s, 0.0, 1.0);
         }
         else
         {
-            return a + d;
+            return glm::clamp(a + d, 0.0, 1.0);
         }
     }
     else
     {
-        return a;
+        return glm::clamp(a, 0.0, 1.0);
     }
 }
 
