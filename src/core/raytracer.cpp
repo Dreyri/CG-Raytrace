@@ -72,19 +72,17 @@ fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& interse
 
     Polygon poly = polygons[polyIndex];
 
-    vec3 normal;
-    //if (poly.material->smoothed)
+    vec3 viewVector = -1.0 * viewRay.direction;
+    vec3 normal = glm::normalize(poly.n1 * u + poly.n2 * v + poly.n3 * w);
+
+    floating rev = glm::degrees(glm::acos(glm::dot(viewVector, normal)));
+    if (rev >= 180.0)
     {
-        normal = glm::normalize(poly.n1 * u + poly.n2 * v + poly.n3 * w);
+        normal *= -1.0;
     }
-    //else
-    //{
-    //    normal = poly.n1;
-    //}
 
     vec3 lightVector = glm::normalize(light.position - intersection);
     vec3 reflectVector = glm::normalize(2 * glm::dot(lightVector, normal) * normal - lightVector);
-    vec3 viewVector = -1.0 * viewRay.direction;
 
     vec3 a, d, s;
     a = poly.material->ambient * (ambient.intensity * ambient.color);
