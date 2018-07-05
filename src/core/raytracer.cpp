@@ -184,7 +184,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         
         fColor refractColor(0.0);
         floating adaptiveRefraction = adpT * polygons[closestIndex].material->refraction_amount;
-        if (adaptiveRefraction > this->adaptiveDepth)
+        if (polygons[closestIndex].material->transparent && adaptiveRefraction > this->adaptiveDepth)
         {
             vec3 refractVector = refract(viewVector, normal, polygons[closestIndex].material->refraction_index);
             trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction);
