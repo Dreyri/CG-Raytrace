@@ -1,19 +1,23 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "defs.hpp"
 
 namespace rt {
-struct camera {
-  glm::vec3 position;
-  glm::quat rotation;
+    struct Camera
+    {
+        vec3 position;
+        vec3 direction;
+        vec3 up{ 0.0, 1.0, 0.0 };
+        floating height, width;
+        unsigned int imageHeight, imageWidth;
+        unsigned int fov;
 
-  float fov;
+        vec3 origin;
+        vec3 topLeft;
+        vec3 stepPixelRight;
+        vec3 stepPixelDown;
 
-  camera(const glm::vec3& position, const glm::quat& rotation, float fov)
-      : position{position}
-      , rotation{rotation}
-      , fov{fov} {
-  }
-};
+        void calculateDerived();
+        vec3 centerOfPixel(unsigned int y, unsigned int x);
+    };
 } // namespace rt

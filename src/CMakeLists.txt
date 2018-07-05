@@ -4,10 +4,24 @@ target_include_directories(example PRIVATE ${ASSIMP_INCLUDE_DIRS})
 target_link_libraries(example PRIVATE ${ASSIMP_LIBRARIES} glm Qt5::Gui rtcore)
 
 add_library(rtcore
-            core/image.cpp
+			core/camera.cpp
+			core/camera.hpp
+			core/light.cpp
+			core/light.hpp
+			core/material.cpp
+			core/material.hpp
+			core/mesh.cpp
+			core/mesh.hpp
+			core/object.cpp
+			core/object.hpp
             core/ray.cpp
+			core/ray.hpp
+			core/raytracer.cpp
+			core/raytracer.hpp
+			core/raytracer_simple.cpp
+			core/raytracer_simple.hpp
             core/scene.cpp
-            core/sphere.cpp
-            core/raytracer_simple.cpp
-            core/tracer_sphere.cpp)
+			core/scene.hpp
+			core/defs.hpp			
+			core/sphere.cpp)
 target_link_libraries(rtcore PRIVATE glm)

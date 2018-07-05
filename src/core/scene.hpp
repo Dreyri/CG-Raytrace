@@ -2,25 +2,20 @@
 
 #include <vector>
 
-#include <glm/vec3.hpp>
-
-#include "ray.hpp"
-#include "sphere.hpp"
+#include "light.hpp"
+#include "camera.hpp"
+#include "object.hpp"
 
 namespace rt {
-class scene {
-public:
-  glm::vec3 background_color{0.0f, 0.0f, 0.0f};
-private:
+    class Scene {
+    public:
+        Camera camera;
+        Light light;
+        AmbientLight ambient;
+        
+        std::vector<Object> objects;
+        std::vector<Polygon> polygons;
 
-  std::vector<rt::sphere> m_spheres;
-public:
-
-  scene() = default;
-  ~scene() = default;
-
-  void add_sphere(const rt::sphere& sph);
-
-  const std::vector<rt::sphere>& spheres() const;
-};
+        void transform();
+    };
 } // namespace rt

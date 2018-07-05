@@ -4,10 +4,12 @@
 
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <QWindow>
 #include <QImage>
 #include <QTime>
 
+#include "core/defs.hpp"
 #include "core/raytracer_simple.hpp"
 
 class ImageTarget : public rt::RenderTarget
@@ -25,9 +27,52 @@ public:
     }
 };
 
+void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int height)
+{
+    rt::Camera cam = rt::Camera();
+    cam.position = rt::vec3(10.0, 3.0, 0.0);
+    cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
+    cam.height = 1.0;
+    cam.width = cam.height * ((rt::floating)width / (rt::floating)height);
+    cam.imageHeight = height;
+    cam.imageWidth = width;
+    cam.fov = 90;
+
+    rt::AmbientLight ambient = rt::AmbientLight();
+    ambient.color = rt::fColor(1.0f, 1.0f, 1.0f);
+    ambient.intensity = 0.5;
+
+    rt::Light light = rt::Light();
+    light.position = rt::vec3(5.0f, 10.0f, 0.0f);
+    light.color = rt::fColor(1.0f, 1.0f, 1.0f);
+    light.intensity = 1.0;
+
+    scene->camera = cam;
+    scene->ambient = ambient;
+    scene->light = light;
+
+    std::shared_ptr<rt::Material> bronze = std::make_shared<rt::Material>();
+    bronze->ambient = { 0.329412, 0.223529, 0.027451 };
+    bronze->diffuse = { 0.780392, 0.568627, 0.113725 };
+    bronze->specular = { 0.992157, 0.941176, 0.807843 };
+    bronze->shininess = 27.8974;
+    bronze->smoothed = false;
+
+    rt::Object box1 = rt::Object();
+    box1.material = bronze;
+    box1.mesh = rt::Mesh::getUnityCube();
+    box1.position = rt::vec3(0.0, 0.0, 4.0);
+    box1.scale = rt::vec3(2.0);
+    box1.rotation = glm::rotate(rt::quaternion(), glm::radians(45.0), rt::vec3(0.0, 1.0, 0.0));
+    scene->objects.push_back(box1);
+}
+
 int main(int argc, char** argv)
 {
     rt::RaytracerSimple tracer = rt::RaytracerSimple();
+    tracer.scene = std::make_shared<rt::Scene>(rt::Scene());
+    setup(tracer.scene, 1920, 1080);
+    tracer.scene->transform();
 
     std::shared_ptr<QImage> image = std::make_shared<QImage>(QImage(1920, 1080, QImage::Format::Format_RGB888));
     std::shared_ptr<ImageTarget> target = std::make_shared<ImageTarget>(ImageTarget(image));
