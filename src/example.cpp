@@ -1,10 +1,12 @@
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
 #include <QWindow>
 #include <QImage>
+#include <QTime>
 
 #include "core/raytracer_simple.hpp"
 
@@ -30,7 +32,15 @@ int main(int argc, char** argv)
     std::shared_ptr<QImage> image = std::make_shared<QImage>(QImage(1920, 1080, QImage::Format::Format_RGB888));
     std::shared_ptr<ImageTarget> target = std::make_shared<ImageTarget>(ImageTarget(image));
 
+    QTime timer = QTime();
+    timer.start();
+
     tracer.render(target);
 
+    unsigned long elapsed = timer.elapsed();
+
     image->save("example.png", "PNG");
+
+    std::cout << elapsed << std::endl;
+    system("PAUSE");
 }
