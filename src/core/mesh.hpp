@@ -12,7 +12,7 @@ namespace rt
     struct Polygon
     {
         vec3 v1, v2, v3;
-        vec3 normal;
+        vec3 n1, n2, n3;
 
         std::shared_ptr<Material> material;
     };

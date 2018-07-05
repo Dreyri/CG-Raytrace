@@ -42,7 +42,7 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     ambient.intensity = 0.5;
 
     rt::Light light = rt::Light();
-    light.position = rt::vec3(5.0, 10.0, 0.0);
+    light.position = rt::vec3(10.0, 10.0, 0.0);
     light.color = rt::fColor(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0;
 

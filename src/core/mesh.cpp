@@ -47,8 +47,19 @@ Mesh Mesh::getUnityCube()
         { 3, 2, 8 },
     };
 
-    std::vector<unsigned int> normalIndixes{
-        1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,
+    std::vector<glm::uvec3> normalIndixes{
+        { 1, 1, 1 },
+        { 1, 1, 1 },
+        { 2, 2, 2 },
+        { 2, 2, 2 },
+        { 3, 3, 3 },
+        { 3, 3, 3 },
+        { 4, 4, 4 },
+        { 4, 4, 4 },
+        { 5, 5, 5 },
+        { 5, 5, 5 },
+        { 6, 6, 6 },
+        { 6, 6, 6 },
     };
 
 
@@ -61,7 +72,9 @@ Mesh Mesh::getUnityCube()
         polygon.v2 = vertexList[vertexIndices[i].y - 1];
         polygon.v3 = vertexList[vertexIndices[i].z - 1];
 
-        polygon.normal = normalList[normalIndixes[i] - 1];
+        polygon.n1 = normalList[normalIndixes[i].x - 1];
+        polygon.n2 = normalList[normalIndixes[i].y - 1];
+        polygon.n3 = normalList[normalIndixes[i].z - 1];
 
         polygon.material = nullptr;
 

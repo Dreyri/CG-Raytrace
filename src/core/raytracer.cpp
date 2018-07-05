@@ -64,7 +64,7 @@ bool Raytracer::lightVisible(Ray& lightRay)
 }
 
 // local light model
-fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection)
+fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w)
 {
     auto& polygons = this->scene->polygons;
     auto& light = this->scene->light;
@@ -73,14 +73,14 @@ fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& interse
     Polygon poly = polygons[polyIndex];
 
     vec3 normal;
-    if (poly.material->smoothed)
+    //if (poly.material->smoothed)
     {
-        // Normale interpolieren
+        normal = glm::normalize(poly.n1 * u + poly.n2 * v + poly.n3 * w);
     }
-    else
-    {
-        normal = poly.normal;
-    }
+    //else
+    //{
+    //    normal = poly.n1;
+    //}
 
     vec3 lightVector = glm::normalize(light.position - intersection);
     vec3 reflectVector = glm::normalize(2 * glm::dot(lightVector, normal) * normal - lightVector);
@@ -124,6 +124,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color)
     floating closestDistance = 99999999.0;
     unsigned int closestIndex = -1;
     floating distance, u, v, w;
+    floating cu, cv, cw;
 
     for (unsigned int p = 0; p < polygons.size(); p++)
     {
@@ -133,6 +134,9 @@ bool Raytracer::trace(Ray& ray, fColor& out_color)
             {
                 closestDistance = distance;
                 closestIndex = p;
+                cu = u;
+                cv = v;
+                cw = w;
             }
         }
     }
@@ -140,7 +144,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color)
     if (closestIndex != -1)
     {
         vec3 intersection = ray.origin + ray.direction * closestDistance;
-        out_color = localLight(closestIndex, ray, intersection);
+        out_color = localLight(closestIndex, ray, intersection, cu, cv, cw);
 
         return true;
     }

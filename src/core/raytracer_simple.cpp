@@ -11,6 +11,8 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
     {
         for (unsigned int b = 0; b < width; b++)
         {
+            if (h == 650 && b == 600)
+                int asdjaid = 111;
             Ray ray = Ray(this->scene->camera.origin, glm::normalize(this->scene->camera.centerOfPixel(h, b) - this->scene->camera.origin));
 
             fColor color;
