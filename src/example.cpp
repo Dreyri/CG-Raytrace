@@ -90,7 +90,15 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     box2.setPosition({ 0.0, 0.0, -4.0 });
     box2.setScale({ 2.0, 2.0, 2.0 });
     box2.setRotation(-45.0, { 0.0, 1.0, 0.0 });
-    scene->objects.push_back(box2);
+    //scene->objects.push_back(box2);
+
+    rt::Object sphere1 = rt::Object();
+    sphere1.material = bronze;
+    sphere1.mesh = rt::Mesh::getUnitySphere();
+    sphere1.setPosition({ 0.0, 0.0, -4.0 });
+    sphere1.setScale({ 2.0, 2.0, 2.0 });
+    sphere1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    scene->objects.push_back(sphere1);
 
     rt::Object glass1 = rt::Object();
     glass1.material = glass;
