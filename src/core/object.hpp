@@ -19,6 +19,8 @@ namespace rt
         vec3 scale;
         quaternion rotation;
 
+        Object(Mesh mesh, std::shared_ptr<Material> mat);
+
         mat4x4 getRotationMat();
         mat4x4 getScaleMat();
         mat4x4 getTranslateMat();

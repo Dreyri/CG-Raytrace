@@ -7,6 +7,10 @@
 
 using namespace rt;
 
+rt::Object::Object(Mesh mesh, std::shared_ptr<Material> mat) : position{vec3(0.0)}, scale{vec3(1.0)}, rotation{quaternion()}, mesh{mesh}, material{mat}, poly_first{0}, poly_last{0}
+{
+}
+
 mat4x4 Object::getRotationMat()
 {
     return glm::toMat4(this->rotation);

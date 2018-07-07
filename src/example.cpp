@@ -76,41 +76,31 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     mirror->reflection_amount = 0.9;
     mirror->transparent = false;
 
-    rt::Object box1 = rt::Object();
-    box1.material = bronze;
-    box1.mesh = rt::Mesh::getUnityCube();
+    rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
     box1.setPosition({0.0, 0.0, 4.0});
     box1.setScale({ 2.0, 2.0, 2.0 });
     box1.setRotation(45.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(box1);
 
-    rt::Object box2 = rt::Object();
-    box2.material = bronze;
-    box2.mesh = rt::Mesh::getUnityCube();
+    rt::Object box2 = rt::Object(rt::Mesh::getUnityCube(), bronze);
     box2.setPosition({ 0.0, 0.0, -4.0 });
     box2.setScale({ 2.0, 2.0, 2.0 });
     box2.setRotation(-45.0, { 0.0, 1.0, 0.0 });
     //scene->objects.push_back(box2);
 
-    rt::Object sphere1 = rt::Object();
-    sphere1.material = bronze;
-    sphere1.mesh = rt::Mesh::getUnitySphere();
+    rt::Object sphere1 = rt::Object(rt::Mesh::getUnitySphere(), bronze);
     sphere1.setPosition({ 0.0, 0.0, -4.0 });
     sphere1.setScale({ 2.0, 2.0, 2.0 });
     sphere1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(sphere1);
 
-    rt::Object glass1 = rt::Object();
-    glass1.material = glass;
-    glass1.mesh = rt::Mesh::getUnityCube();
+    rt::Object glass1 = rt::Object(rt::Mesh::getUnityCube(), glass);
     glass1.setPosition({ 4.0, 0.0, 4.0 });
     glass1.setScale({0.1, 3.0, 3.0});
     glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     //scene->objects.push_back(glass1);
 
-    rt::Object mirror1 = rt::Object();
-    mirror1.material = glass;
-    mirror1.mesh = rt::Mesh::getUnityCube();
+    rt::Object mirror1 = rt::Object(rt::Mesh::getUnityCube(), mirror);
     mirror1.setPosition({ -5.0, 0.0, 4.0 });
     mirror1.setScale({ 0.1, 8.0, 8.0 });
     mirror1.setRotation(0.0, { 0.0, 1.0, 0.0 });
