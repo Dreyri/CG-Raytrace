@@ -17,6 +17,14 @@ namespace rt
         std::shared_ptr<Material> material;
     };
 
+    enum MeshType
+    {
+        noBounding,
+        unityCube,
+        unitySphere,
+        objFile,
+    };
+
     class Mesh
     {
     private:
@@ -25,6 +33,7 @@ namespace rt
 
     public:
         std::vector<Polygon> polygons;
+        MeshType type;
 
         static Mesh getUnityCube();
         static Mesh getUnitySphere();

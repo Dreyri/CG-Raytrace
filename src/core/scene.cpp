@@ -36,5 +36,63 @@ void Scene::transform()
 
         object.poly_first = first;
         object.poly_last = last;
+
+        if (object.mesh.type != MeshType::noBounding)
+        {
+            this->setBoundingSphere(object);
+        }
     }
+}
+
+vec3 Scene::getBoundingCenter(Object& obj)
+{
+    switch (obj.mesh.type)
+    {
+    case MeshType::noBounding:
+    case MeshType::unityCube:
+    case MeshType::unitySphere:
+        return obj.position;
+        break;
+    }
+}
+
+floating Scene::getBoundingRadius(Object& obj)
+{
+    floating longest = 0.0;
+
+    switch (obj.mesh.type)
+    {
+    case MeshType::noBounding:
+        return 0.0;
+        break;
+    case MeshType::unityCube:
+        for(int i = obj.poly_first; i <= obj.poly_last; i++)
+        {
+            floating l = glm::length(this->polygons[i].v1);
+            if (l > longest)
+            {
+                longest = l;
+            }
+            l = glm::length(this->polygons[i].v2);
+            if (l > longest)
+            {
+                longest = l;
+            }
+            l = glm::length(this->polygons[i].v3);
+            if (l > longest)
+            {
+                longest = l;
+            }
+        }
+        return longest;
+        break;
+    case MeshType::unitySphere:
+        return glm::length(this->polygons[obj.poly_first].v1);
+        break;
+    }
+}
+
+void Scene::setBoundingSphere(Object& obj)
+{
+    obj.bounding = Sphere(getBoundingCenter(obj), getBoundingRadius(obj));
 }

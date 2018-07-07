@@ -1,8 +1,7 @@
 #include "sphere.hpp"
 
-namespace rt {
-sphere::sphere(const glm::vec3& position, float radius)
-    : position{position}
-    , radius{radius} {
+using namespace rt;
+
+Sphere::Sphere(vec3& position, floating radius) : position{position}, radius{radius} 
+{
 }
-} // namespace rt

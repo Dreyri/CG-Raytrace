@@ -84,6 +84,8 @@ Mesh Mesh::getUnityCube()
     }
 
     Mesh::unityCube = mesh;
+
+    mesh.type = MeshType::unityCube;
     return mesh;
 }
 
@@ -216,5 +218,7 @@ Mesh Mesh::getUnitySphere()
     }
 
     Mesh::unitySphere = mesh;
+
+    mesh.type = MeshType::unitySphere;
     return mesh;
 }

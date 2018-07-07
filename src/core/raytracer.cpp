@@ -133,17 +133,23 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
     floating distance, u, v, w;
     floating cu, cv, cw;
 
-    for (unsigned int p = 0; p < polygons.size(); p++)
+    for (auto& obj : this->scene->objects)
     {
-        if (intersectTriangle(ray, polygons[p], distance, u, v, w))
-        {
-            if (distance < closestDistance)
+        if(obj.mesh.type == MeshType::noBounding || intersectSphere(ray, obj.bounding))
+        { 
+            for (unsigned int p = obj.poly_first; p <= obj.poly_last; p++)
             {
-                closestDistance = distance;
-                closestIndex = p;
-                cu = u;
-                cv = v;
-                cw = w;
+                if (intersectTriangle(ray, polygons[p], distance, u, v, w))
+                {
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestIndex = p;
+                        cu = u;
+                        cv = v;
+                        cw = w;
+                    }
+                }
             }
         }
     }
@@ -176,26 +182,17 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         }
 
         out_color = glm::clamp(localColor + (polygons[closestIndex].material->reflection_amount * reflectColor) + (polygons[closestIndex].material->refraction_amount * refractColor), 0.0, 1.0);
-
         return true;
     }
     else
     {
         out_color = this->background;
-
         return false;
     }
 }
 
-/*
-bool intersectSphere(const ray& r, const sphere& sph)
+bool Raytracer::intersectSphere(const Ray& r, const Sphere& sph)
 {
-    if constexpr (CheckNormalized) {
-        if (!glm::isNormalized(r.direction, 0.001f)) {
-            throw std::logic_error("ray is not normalized");
-        }
-    }
-
     auto relative_sphere_pos = sph.position - r.origin;
     auto sphere_ray_dot = glm::dot(relative_sphere_pos, r.direction);
 
@@ -205,27 +202,27 @@ bool intersectSphere(const ray& r, const sphere& sph)
     }
 
     // distance to sphere center squared
-    float d2 = glm::dot(relative_sphere_pos, relative_sphere_pos) -
+    floating d2 = glm::dot(relative_sphere_pos, relative_sphere_pos) -
         sphere_ray_dot * sphere_ray_dot;
     if (d2 >(sph.radius * sph.radius)) {
         return false;
     }
 
-    float thc = sqrt((sph.radius * sph.radius) - d2);
+    floating thc = sqrt((sph.radius * sph.radius) - d2);
 
-    float t0 = sphere_ray_dot - thc;
-    float t1 = sphere_ray_dot - thc;
+    floating t0 = sphere_ray_dot - thc;
+    floating t1 = sphere_ray_dot - thc;
 
     if (t0 > t1) {
         std::swap(t0, t1);
     }
 
-    if (t0 < 0) {
+    if (t0 < 0.0) {
         t0 = t1;
-        if (t0 < 0) {
+        if (t0 < 0.0) {
             return false;
         }
     }
 
     return true;
-}*/
+}

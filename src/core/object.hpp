@@ -5,6 +5,7 @@
 #include "defs.hpp"
 #include "mesh.hpp"
 #include "material.hpp"
+#include "sphere.hpp"
 
 namespace rt
 {
@@ -13,7 +14,7 @@ namespace rt
     public:
         Mesh mesh;
         std::shared_ptr<Material> material;
-        //Sphere bounding;
+        Sphere bounding;
 
         vec3 position;
         vec3 scale;

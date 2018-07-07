@@ -11,6 +11,7 @@
 #include "object.hpp"
 #include "ray.hpp"
 #include "scene.hpp"
+#include "sphere.hpp"
 
 namespace rt
 {
@@ -39,7 +40,7 @@ namespace rt
         bool lightVisible(Ray& lightRay);
         fColor localLight(unsigned int polyIndex, Ray& viewRay, vec3& intersection, floating& u, floating& v, floating& w, vec3& normal);
         bool trace(Ray& ray, fColor& out_color, unsigned int depth, floating adpT);
-        //bool intersectSphere(const ray& r, const sphere& sph);
+        bool intersectSphere(const Ray& r, const Sphere& sph);
 
         virtual void render(std::shared_ptr<rt::RenderTarget> target) = 0;
     };

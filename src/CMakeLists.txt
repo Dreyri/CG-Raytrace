@@ -23,5 +23,6 @@ add_library(rtcore
             core/scene.cpp
 			core/scene.hpp
 			core/defs.hpp			
-			core/sphere.cpp)
+			core/sphere.cpp
+			core/sphere.hpp)
 target_link_libraries(rtcore PRIVATE glm)
