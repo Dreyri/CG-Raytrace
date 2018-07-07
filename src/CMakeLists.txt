@@ -5,10 +5,10 @@ target_link_libraries(example PRIVATE ${ASSIMP_LIBRARIES} glm Qt5::Gui rtcore)
 
 add_executable(rt
   main.cpp)
-target_link_libraries(rt PRIVATE glm Qt5::Gui rtcore Qt5::Widgets)
+target_link_libraries(rt PRIVATE glm Qt5::Gui Qt5::Widgets rtcore)
 
 add_library(rtcore
-            window.cpp
+            rtscene.cpp
             core/image.cpp
             core/ray.cpp
             core/scene.cpp
