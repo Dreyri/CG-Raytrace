@@ -10,7 +10,7 @@ void rt::RaytracerSimple::renderMulti(unsigned int start, unsigned int step)
 
     for (unsigned int h = 0; h < height; h++)
     {
-        for (unsigned int b = start; b < width; b *= step)
+        for (unsigned int b = start; b < width; b += step)
         {
             Ray ray = Ray(this->scene->camera.origin, glm::normalize(this->scene->camera.centerOfPixel(h, b) - this->scene->camera.origin));
             fColor color;
