@@ -11,5 +11,11 @@ private:
 public:
   RaytraceScene();
   virtual ~RaytraceScene();
+
+signals:
+  void displayedPixmapChanged(QPixmap* pm);
+
+public slots:
+  void displayPixmap(QPixmap* pm);
 };
 } // namespace rt

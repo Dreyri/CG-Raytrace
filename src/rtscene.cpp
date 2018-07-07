@@ -10,4 +10,10 @@ RaytraceScene::RaytraceScene()
 
 RaytraceScene::~RaytraceScene() {
 }
+
+void RaytraceScene::displayPixmap(QPixmap* pm) {
+  m_pixmap->setPixmap(*pm);
+
+  emit displayedPixmapChanged(pm);
+}
 } // namespace rt

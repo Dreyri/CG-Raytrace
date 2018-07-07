@@ -5,10 +5,6 @@
 
 int main(int argc, char** argv) {
   QApplication app(argc, argv);
-  /*
-  rt::Window window(nullptr);
-  window.show();
-  */
 
   rt::RaytraceScene scene;
   QGraphicsView view(&scene);
