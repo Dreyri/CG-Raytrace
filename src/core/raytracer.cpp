@@ -76,7 +76,7 @@ fColor Raytracer::localLight(unsigned int polyIndex, Ray& viewRay, vec3& interse
 
     Polygon poly = polygons[polyIndex];
 
-    vec3 viewVector = -1.0 * viewRay.direction;
+    vec3 viewVector = viewRay.direction;
     normal = glm::normalize((poly.n1 * w) + (poly.n2 * u) + (poly.n3 * v));
 
     floating rev = glm::degrees(glm::acos(glm::dot(viewVector, normal)));
