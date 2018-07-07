@@ -39,10 +39,10 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
 
     rt::AmbientLight ambient = rt::AmbientLight();
     ambient.color = rt::fColor(1.0f, 1.0f, 1.0f);
-    ambient.intensity = 0.8;
+    ambient.intensity = 1.0;
 
     rt::Light light = rt::Light();
-    light.position = rt::vec3(10.0, 5.0, 0.0);
+    light.position = rt::vec3(5.0, 8.0, -5.0);
     light.color = rt::fColor(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0;
 
@@ -91,7 +91,7 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     rt::Object sphere1 = rt::Object(rt::Mesh::getUnitySphere(), bronze);
     sphere1.setPosition({ 0.0, 0.0, -4.0 });
     sphere1.setScale({ 2.0, 2.0, 2.0 });
-    sphere1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    sphere1.setRotation(-20.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(sphere1);
 
     rt::Object glass1 = rt::Object(rt::Mesh::getUnityCube(), glass);
@@ -103,7 +103,7 @@ void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int he
     rt::Object mirror1 = rt::Object(rt::Mesh::getUnityCube(), mirror);
     mirror1.setPosition({ -5.0, 0.0, 4.0 });
     mirror1.setScale({ 0.1, 8.0, 8.0 });
-    mirror1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    //mirror1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     //scene->objects.push_back(mirror1);
 }
 
