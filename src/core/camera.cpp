@@ -2,6 +2,17 @@
 
 using namespace rt;
 
+Camera::Camera() : up{vec3(0.0, 1.0, 0.0)}, height{1.0}
+{
+}
+
+void rt::Camera::setViewpane(unsigned int width, unsigned int height)
+{
+    this->width = this->height * ((rt::floating)width / (rt::floating)height);
+    this->imageHeight = height;
+    this->imageWidth = width;
+}
+
 void Camera::calculateDerived()
 {
     direction = glm::normalize(direction); // normalize view direction just in case

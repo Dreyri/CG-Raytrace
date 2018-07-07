@@ -37,6 +37,4 @@ void Scene::transform()
         object.poly_first = first;
         object.poly_last = last;
     }
-
-    this->camera.calculateDerived();
 }

@@ -17,6 +17,8 @@ namespace rt {
         vec3 stepPixelRight;
         vec3 stepPixelDown;
 
+        Camera();
+        void setViewpane(unsigned int width, unsigned int height);
         void calculateDerived();
         vec3 centerOfPixel(unsigned int y, unsigned int x);
     };

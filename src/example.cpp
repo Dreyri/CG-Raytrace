@@ -26,15 +26,11 @@ public:
     }
 };
 
-void setup(std::shared_ptr<rt::Scene> scene, unsigned int width, unsigned int height)
+void setup(std::shared_ptr<rt::Scene> scene)
 {
     rt::Camera cam = rt::Camera();
     cam.position = rt::vec3(10.0, 3.0, 0.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
-    cam.height = 1.0;
-    cam.width = cam.height * ((rt::floating)width / (rt::floating)height);
-    cam.imageHeight = height;
-    cam.imageWidth = width;
     cam.fov = 90;
 
     rt::AmbientLight ambient = rt::AmbientLight();
@@ -111,7 +107,7 @@ int main(int argc, char** argv)
 {
     rt::RaytracerSimple tracer = rt::RaytracerSimple();
     tracer.scene = std::make_shared<rt::Scene>(rt::Scene());
-    setup(tracer.scene, 1920, 1080);
+    setup(tracer.scene);
     tracer.scene->transform();
 
     std::shared_ptr<QImage> image = std::make_shared<QImage>(QImage(1920, 1080, QImage::Format::Format_RGB888));

@@ -6,6 +6,8 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
 {
     unsigned int height = target->getHeight();
     unsigned int width = target->getWidth();
+    this->scene->camera.setViewpane(width, height);
+    this->scene->camera.calculateDerived();
 
     for (unsigned int h = 0; h < height; h++)
     {
