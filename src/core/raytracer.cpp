@@ -159,7 +159,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         vec3 normal;
         fColor localColor;
         vec3 intersection = ray.origin + ray.direction * closestDistance;
-        vec3 viewVector = ray.direction * -1.0;
+        vec3 viewVector = ray.direction;// *-1.0;
         localColor = localLight(closestIndex, ray, intersection, cu, cv, cw, normal);
 
         fColor reflectColor(0.0);
