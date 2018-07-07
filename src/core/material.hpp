@@ -15,6 +15,9 @@ namespace rt
         floating refraction_index;
         floating refraction_amount;
 
+        bool reflection;
         floating reflection_amount;
+
+        Material();
     };
 }

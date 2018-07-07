@@ -29,8 +29,11 @@ namespace rt
     public:
         std::shared_ptr<Scene> scene;
 
-        unsigned int maxDepth = 10;
-        floating adaptiveDepth = 0.05;
+        unsigned int maxDepth;
+        floating adaptiveDepth;
+        fColor background;
+
+        Raytracer();
 
         bool intersectTriangle(Ray& ray, Polygon& poly, floating& t, floating& u, floating& v, floating& w);       
         bool lightVisible(Ray& lightRay);

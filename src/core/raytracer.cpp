@@ -2,6 +2,10 @@
 
 using namespace rt;
 
+rt::Raytracer::Raytracer() : maxDepth{8}, adaptiveDepth{0.05}, background{fColor(0.2f, 0.2f, 0.2f)}
+{
+}
+
 bool Raytracer::intersectTriangle(Ray& ray, Polygon& poly, floating& t, floating& u, floating& v, floating& w)
 {
     const floating EPSILON = 0.0000001;
@@ -154,7 +158,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
 
         fColor reflectColor(0.0);
         floating adaptiveReflection = adpT * polygons[closestIndex].material->reflection_amount;
-        if (adaptiveReflection > this->adaptiveDepth)
+        if (polygons[closestIndex].material->reflection && adaptiveReflection > this->adaptiveDepth)
         {
             vec3 reflectVector = glm::normalize(glm::reflect(viewVector, normal));
             trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection);
@@ -165,7 +169,10 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         if (polygons[closestIndex].material->transparent && adaptiveRefraction > this->adaptiveDepth)
         {
             vec3 refractVector = glm::refract(viewVector, normal, 1.0 / polygons[closestIndex].material->refraction_index);
-            trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction);
+            if (!trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction))
+            {
+                refractColor = this->background;
+            }
         }
 
         out_color = glm::clamp(localColor + (polygons[closestIndex].material->reflection_amount * reflectColor) + (polygons[closestIndex].material->refraction_amount * refractColor), 0.0, 1.0);
@@ -174,11 +181,11 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
     }
     else
     {
+        out_color = this->background;
+
         return false;
     }
 }
-
-
 
 /*
 bool intersectSphere(const ray& r, const sphere& sph)
