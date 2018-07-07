@@ -23,9 +23,9 @@ void Scene::transform()
             transformed.v2 = model_transform * vec4(source.v2, 1.0);
             transformed.v3 = model_transform * vec4(source.v3, 1.0);
 
-            transformed.n1 = glm::normalize(model_transform * vec4(source.n1, 1.0));
-            transformed.n2 = glm::normalize(model_transform * vec4(source.n2, 1.0));
-            transformed.n3 = glm::normalize(model_transform * vec4(source.n3, 1.0));
+            transformed.n1 = model_rotate * vec4(source.n1, 1.0);
+            transformed.n2 = model_rotate * vec4(source.n2, 1.0);
+            transformed.n3 = model_rotate * vec4(source.n3, 1.0);
 
             transformed.material = object.material;
 
