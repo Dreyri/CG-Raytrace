@@ -153,20 +153,20 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         localColor = localLight(closestIndex, ray, intersection, cu, cv, cw, normal);
 
         fColor reflectColor(0.0);
-        /*floating adaptiveReflection = adpT * polygons[closestIndex].material->reflection_amount;
+        floating adaptiveReflection = adpT * polygons[closestIndex].material->reflection_amount;
         if (adaptiveReflection > this->adaptiveDepth)
         {
             vec3 reflectVector = glm::normalize(glm::reflect(viewVector, normal));
             trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection);
-        }*/
+        }
         
         fColor refractColor(0.0);
-        /*floating adaptiveRefraction = adpT * polygons[closestIndex].material->refraction_amount;
+        floating adaptiveRefraction = adpT * polygons[closestIndex].material->refraction_amount;
         if (polygons[closestIndex].material->transparent && adaptiveRefraction > this->adaptiveDepth)
         {
             vec3 refractVector = glm::refract(viewVector, normal, 1.0 / polygons[closestIndex].material->refraction_index);
             trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction);
-        }*/
+        }
 
         out_color = glm::clamp(localColor + (polygons[closestIndex].material->reflection_amount * reflectColor) + (polygons[closestIndex].material->refraction_amount * refractColor), 0.0, 1.0);
 
