@@ -11,9 +11,8 @@ RaytraceScene::RaytraceScene()
 RaytraceScene::~RaytraceScene() {
 }
 
-void RaytraceScene::displayPixmap(QPixmap* pm) {
-  m_pixmap->setPixmap(*pm);
-
-  emit displayedPixmapChanged(pm);
+void RaytraceScene::display(uint8_t* pixels, size_t width, size_t height) {
+  QImage img((unsigned char*)pixels, width, height, QImage::Format_RGBA8888);
+  m_pixmap->setPixmap(QPixmap::fromImage(std::move(img)));
 }
 } // namespace rt

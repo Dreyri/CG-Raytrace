@@ -8,14 +8,12 @@ namespace rt {
 class RaytraceScene : public QGraphicsScene {
 private:
   QGraphicsPixmapItem* m_pixmap;
+
 public:
   RaytraceScene();
   virtual ~RaytraceScene();
 
-signals:
-  void displayedPixmapChanged(QPixmap* pm);
-
 public slots:
-  void displayPixmap(QPixmap* pm);
+  void display(uint8_t* pixels, size_t width, size_t height);
 };
 } // namespace rt
