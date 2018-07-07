@@ -16,10 +16,12 @@ namespace rt {
         Camera camera;
         Light light;
         AmbientLight ambient;
+        fColor background;
         
         std::vector<Object> objects;
         std::vector<Polygon> polygons;
 
+        Scene();
         void transform();
     };
 } // namespace rt

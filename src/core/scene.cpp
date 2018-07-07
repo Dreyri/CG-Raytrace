@@ -2,6 +2,10 @@
 
 using namespace rt;
 
+rt::Scene::Scene() : background(fColor(0.0, 0.0, 0.0))
+{
+}
+
 void Scene::transform()
 {
     this->polygons.clear();

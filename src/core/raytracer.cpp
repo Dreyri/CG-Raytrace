@@ -2,7 +2,7 @@
 
 using namespace rt;
 
-rt::Raytracer::Raytracer() : maxDepth{8}, adaptiveDepth{0.05}, background{fColor(0.2f, 0.2f, 0.2f)}
+rt::Raytracer::Raytracer() : maxDepth{8}, adaptiveDepth{0.05}
 {
 }
 
@@ -167,7 +167,10 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         if (polygons[closestIndex].material->reflection && adaptiveReflection > this->adaptiveDepth)
         {
             vec3 reflectVector = glm::normalize(glm::reflect(viewVector, normal));
-            trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection);
+            if (!trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection))
+            {
+                reflectColor = this->scene->background;
+            }
         }
         
         fColor refractColor(0.0);
@@ -177,7 +180,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
             vec3 refractVector = glm::refract(viewVector, normal, 1.0 / polygons[closestIndex].material->refraction_index);
             if (!trace(rt::Ray(intersection, refractVector), refractColor, depth + 1, adaptiveRefraction))
             {
-                refractColor = this->background;
+                refractColor = this->scene->background;
             }
         }
 
@@ -186,7 +189,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
     }
     else
     {
-        out_color = this->background;
+        out_color = this->scene->background;
         return false;
     }
 }

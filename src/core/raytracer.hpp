@@ -32,7 +32,6 @@ namespace rt
 
         unsigned int maxDepth;
         floating adaptiveDepth;
-        fColor background;
 
         Raytracer();
 
