@@ -1,9 +1,12 @@
 #include "window.hpp"
 
 namespace rt {
-Widget::Widget(Raytracer* rt)
+Window::Window(Raytracer* rt)
     : m_raytracer{rt}
-    , m_currentRenderImage{m_raytracer->currentColors()} {
-  rt->resize(width(), height());
+    , m_imageLabel{new QLabel} {
+  setCentralWidget(m_imageLabel);
+}
+
+Window::~Window() {
 }
 } // namespace rt

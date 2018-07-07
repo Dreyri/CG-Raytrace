@@ -1,8 +1,8 @@
 #include <memory>
 
-#include <QOpenGLFunctions_3_3_Core>
-#include <QOpenGLTexture>
-#include <QOpenGLWidget>
+#include <QMainWindow>
+#include <QPainter>
+#include <QLabel>
 
 #include <glm/glm.hpp>
 
@@ -13,42 +13,32 @@ public:
   /**
    * start raytracing our scene
    */
-  virtual void render() = 0;
+  virtual QImage render() = 0;
   /**
    * cancel our current raytracing process
    */
   virtual void cancelRender() = 0;
   /**
-   * the vector with colors which is being updated from the render call
-   * this is used to continuously update the texture whilst raytracing is being done
-   * read access to this value should be thread safe
-   */
-  virtual const std::vector<glm::vec4>& currentColors() const = 0;
-  /**
    * resize the output data set, preceeded by a call to cancelRender
+   * not used at first
    */
   virtual void resize(int w, int h) = 0;
-  /**
-   * indicates rendering is done and this image can be used until the next
-   * rendering has finished
-   */
-  virtual bool renderingDone() const = 0;
 };
 
-class Widget : public QOpenGLWidget, QOpenGLFunctions_3_3_Core {
+class Window : public QMainWindow {
   Q_OBJECT
 private:
   std::unique_ptr<Raytracer> m_raytracer;
-
-  const std::vector<glm::vec4>& m_currentRenderImage;
-
-  QOpenGLTexture m_texture;
+  QLabel* m_imageLabel;
 
 public:
-  Widget(Raytracer* rt);
+  Window(Raytracer* rt);
+  virtual ~Window();
 
-  virtual void initializeGL() override;
-  virtual void resizeGL(int w, int h) override;
-  virtual void paintGL() override;
+  void setPosition(const glm::vec3& pos);
+
+signals:
+  void positionChanged(glm::vec3 pos);
+
 };
 } // namespace rt
