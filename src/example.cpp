@@ -42,6 +42,7 @@ void setup(std::shared_ptr<rt::Scene> scene)
     light.color = rt::fColor(1.0f, 1.0f, 1.0f);
     light.intensity = 1.0;
 
+    scene->background = rt::fColor(0.5294117647, 0.80784313725, 0.92156862745);
     scene->camera = cam;
     scene->ambient = ambient;
     scene->light = light;
@@ -68,10 +69,11 @@ void setup(std::shared_ptr<rt::Scene> scene)
 
     std::shared_ptr<rt::Material> mirror = std::make_shared<rt::Material>();
     mirror->ambient = { 0.2, 0.2, 0.2 };
-    mirror->diffuse = { 0.2, 0.2, 0.2 };
-    mirror->specular = { 0.2, 0.2, 0.2 };
-    mirror->shininess = 10.0;
-    mirror->reflection_amount = 0.9;
+    mirror->diffuse = { 0.4, 0.4, 0.4 };
+    mirror->specular = { 0.95, 0.95, 0.95 };
+    mirror->shininess = 5.0;
+    mirror->reflection = true;
+    mirror->reflection_amount = 0.95;
     mirror->transparent = false;
 
     rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
@@ -96,13 +98,18 @@ void setup(std::shared_ptr<rt::Scene> scene)
     glass1.setPosition({ 4.0, 0.0, 4.0 });
     glass1.setScale({0.1, 3.0, 3.0});
     glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
-    scene->objects.push_back(glass1);
+    //scene->objects.push_back(glass1);
 
     rt::Object mirror1 = rt::Object(rt::Mesh::getUnityCube(), mirror);
     mirror1.setPosition({ -5.0, 0.0, 4.0 });
     mirror1.setScale({ 0.1, 8.0, 8.0 });
     mirror1.setRotation(15.0, { 0.0, 1.0, 0.0 });
     //scene->objects.push_back(mirror1);
+
+    rt::Object sphere2 = rt::Object(rt::Mesh::getUnitySphere(), mirror);
+    sphere2.setPosition({ -8.0, -4.0, 0.0 });
+    sphere2.setScale({ 4.0, 4.0, 4.0 });
+    scene->objects.push_back(sphere2);
 }
 
 int main(int argc, char** argv)
