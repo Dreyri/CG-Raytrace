@@ -181,6 +181,10 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
             {
                 localColor += (material.reflection_amount * reflectColor);
             }
+            /*else
+            {
+                localColor += (material.reflection_amount * this->scene->background);
+            }*/
         }
 
         // Refraction

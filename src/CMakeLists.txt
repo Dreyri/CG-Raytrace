@@ -3,6 +3,17 @@ add_executable(example
 target_include_directories(example PRIVATE ${ASSIMP_INCLUDE_DIRS})
 target_link_libraries(example PRIVATE ${ASSIMP_LIBRARIES} glm Qt5::Gui rtcore)
 
+add_executable(rt
+			   main.cpp
+			   mainwindow.cpp
+			   mainwindow.hpp
+			   renderboy.cpp
+			   renderboy.hpp
+			   setup.hpp
+			   simple.cpp
+			   simple.hpp)
+target_link_libraries(rt PRIVATE glm Qt5::Gui Qt5::Widgets rtcore)
+
 add_library(rtcore
 			core/camera.cpp
 			core/camera.hpp

@@ -16,6 +16,7 @@ namespace rt
         void renderMulti(unsigned int start, unsigned int step);
 
     public:
+        unsigned int numThreads;
         void render(std::shared_ptr<RenderTarget> target) override;
     };
 }
