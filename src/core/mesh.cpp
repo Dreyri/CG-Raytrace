@@ -79,7 +79,6 @@ Mesh Mesh::getUnityCube()
         polygon.n3 = normalList[normalIndixes[i].z - 1];
 
         polygon.material = nullptr;
-        polygon.objIndex = -1;
 
         mesh.polygons.push_back(polygon);
     }
@@ -214,7 +213,6 @@ Mesh Mesh::getUnitySphere()
         polygon.n3 = glm::normalize(polygon.v3);
 
         polygon.material = nullptr;
-        polygon.objIndex = -1;
 
         mesh.polygons.push_back(polygon);
     }
