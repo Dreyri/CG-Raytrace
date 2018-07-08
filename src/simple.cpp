@@ -8,7 +8,7 @@ void SimpleScene1::setup()
     tracer.scene = this->scene;
 
     rt::Camera cam = rt::Camera();
-    cam.position = rt::vec3(10.0, 3.0, 0.0);
+    cam.position = rt::vec3(8.0, 3.0, 0.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.fov = 90;
 
@@ -74,7 +74,7 @@ void SimpleScene1::setup()
     glass1.setPosition({ 5.0, 2.0, 3.0 });
     glass1.setScale({ 2.0, 2.0, 2.0 });
     //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
-    scene->objects.push_back(glass1);
+    //scene->objects.push_back(glass1);
 
     rt::Object glass2 = rt::Object(rt::Mesh::getUnityCube(), glass);
     glass2.setPosition({ 4.0, 0.0, 4.0 });
@@ -92,10 +92,17 @@ void SimpleScene1::setup()
     sphere2.setPosition({ -8.0, -4.0, 0.0 });
     sphere2.setScale({ 4.0, 4.0, 4.0 });
     //scene->objects.push_back(sphere2);
+
+    this->timer.start();
+    this->frameCount = 0;
 }
 
 void SimpleScene1::transform()
 {
+    this->frameCount++;
+
+    double boxRot = (ulong)(0.0005 * this->timer.elapsed()) % 360;
+    tracer.scene->objects[0].setRotation(boxRot, {0.0, 1.0, 0.0});
     tracer.scene->transform();
 }
 

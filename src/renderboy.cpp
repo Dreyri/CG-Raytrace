@@ -1,5 +1,7 @@
 #include "renderboy.hpp"
 
+#include <iostream>
+
 Renderboy::Renderboy()
 {
 
@@ -18,7 +20,7 @@ void Renderboy::run()
     while (true)
     {
         sc1.transform();
-        QImage img = QImage(400, 300, QImage::Format_RGB888);
+        QImage img = QImage(640, 480, QImage::Format_RGBA8888);
         sc1.render(img);
         emit setImage(img);
     }

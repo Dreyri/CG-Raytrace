@@ -2,6 +2,7 @@
 
 #include <QImage>
 #include <QThread>
+#include <QElapsedTimer>
 
 #include "setup.hpp"
 #include "core/defs.hpp"
@@ -28,6 +29,8 @@ class SimpleScene1 : Setup
 private:
     rt::RaytracerSimple tracer;
     std::shared_ptr<rt::Scene> scene;
+    QElapsedTimer timer;
+    unsigned int frameCount;
 
 public:
     void setup() override;
