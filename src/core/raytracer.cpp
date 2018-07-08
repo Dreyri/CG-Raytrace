@@ -160,66 +160,45 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         
         floating adaptiveReflection = adpT * material.reflection_amount;
         floating adaptiveRefraction = adpT * material.refraction_amount;
+        fColor reflectColor(0.0);
+        fColor refractColor(0.0);
+
+        floating outsideDensity = 1.0;
+        floating insideDensity = material.refraction_index;
+        floating viewProjection = glm::clamp(glm::dot(viewVector, normal), -1.0, 1.0);
+        vec3 outNormal = normal;
+        if (viewProjection > 0.0)
+        {
+            outNormal = -normal;
+            std::swap(outsideDensity, insideDensity);
+        }
 
         // Reflection
-        if (!polygons[closestIndex].material->transparent && adaptiveReflection > this->adaptiveDepth)
+        if (adaptiveReflection > this->adaptiveDepth)
         {
-            fColor reflectColor(0.0);
-            vec3 reflectVector = glm::normalize(glm::reflect(viewVector, normal));
-
-            if (!trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection))
+            vec3 reflectVector = glm::reflect(viewVector, outNormal);
+            if (trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection))
             {
-                reflectColor = this->scene->background;
+                localColor += (material.reflection_amount * reflectColor);
             }
-            out_color = glm::clamp(localColor + (material.reflection_amount * reflectColor), 0.0, 1.0);
-            return true;
         }
-        // Reflection and Refraction
-        else if(polygons[closestIndex].material->transparent)
+
+        // Refraction
+        if(polygons[closestIndex].material->transparent && adaptiveRefraction > this->adaptiveDepth)
         {
-            fColor reflectColor(0.0);
-            fColor refractColor(0.0);
-
-            if(adaptiveRefraction > this->adaptiveDepth)
+            vec3 refractVector = glm::refract(viewVector, outNormal, glm::clamp(outsideDensity / insideDensity, -1.0, 1.0));
+            if (trace(rt::Ray(intersection + (0.1*refractVector), refractVector), refractColor, depth + 1, adaptiveRefraction))
             {
-                floating etai = 1.0, etat = material.refraction_index;
-                floating cosi = glm::clamp(glm::dot(normal, viewVector), -1.0, 1.0);
-                vec3 n = normal;
-                if (cosi < 0) 
-                {
-                    cosi = -cosi;
-                }
-                else {
-                    std::swap(etai, etat);
-                    n = -n;
-                }
-                floating eta = etai / etat;
-                floating k = 1.0 - eta * eta * (1.0 - cosi * cosi);
-                vec3 refractVector = eta * viewVector + (eta * cosi - sqrtf(k)) * n;
-                //vec3 refractVector = glm::refract(viewVector, normal, ior);
-
-                if (k > 0 && !trace(rt::Ray(intersection + (0.1*refractVector), refractVector), refractColor, depth + 1, adaptiveRefraction))
-                {
-                    refractColor = this->scene->background;
-                }
+                localColor += (material.refraction_amount * refractColor);
             }
-            if (adaptiveReflection > this->adaptiveDepth)
+            else
             {
-                vec3 reflectVector = glm::normalize(glm::reflect(viewVector, normal));
-                if (!trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection))
-                {
-                    reflectColor = this->scene->background;
-                }
+                localColor += (material.refraction_amount * this->scene->background);
             }
-            out_color = glm::clamp(localColor + (material.reflection_amount * reflectColor) + (material.refraction_amount * refractColor), 0.0, 1.0);
-            return true;
         }
-        // Only local color
-        else
-        {
-            out_color = glm::clamp(localColor, 0.0, 1.0);
-            return true;
-        }        
+        
+        out_color = glm::clamp(localColor, 0.0, 1.0);
+        return true;        
     }
     else
     {
