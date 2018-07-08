@@ -5,6 +5,7 @@
 #include <limits>
 
 #include "ray.hpp"
+#include "scene.hpp"
 
 namespace rt {
 namespace path {
@@ -41,9 +42,10 @@ private:
 public:
   Renderer();
 
-  void render(RenderTarget* targ, uint32_t samples = 1, uint32_t depth = 1);
-  glm::vec4 traceRay(const rt::path::ray<float>& r, uint32_t depth,
-                     uint32_t min_depth);
+  void render(rt::path::scene* scene, rt::path::RenderTarget* targ,
+              uint32_t samples = 1, uint32_t depth = 1);
+  glm::vec4 traceRay(rt::path::scene* scene, const rt::path::ray<float>& r,
+                     uint32_t depth, uint32_t min_depth);
 };
 } // namespace path
 } // namespace rt

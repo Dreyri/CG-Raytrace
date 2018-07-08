@@ -4,6 +4,7 @@
 #include "rendertarget.hpp"
 
 #include "../core/camera.hpp"
+#include "../core/scene.hpp"
 
 #include "ray.hpp"
 
@@ -14,6 +15,7 @@ namespace path {
 
 static rt::path::ray<float> monteCarloRay(const rt::camera& cam, float x,
                                           float y, const rt::path::Rng& rng) {
+  // TODO use variance
   float aspectRatio = cam.aspectRatio();
   float px = (2.0f * ((x + 0.5f) / cam.width) - 1.0f) *
              std::tan(cam.fov / 2 * pi() / 180.0f) * aspectRatio;
@@ -29,7 +31,8 @@ Renderer::Renderer() {
   m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
 }
 
-void Renderer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
+void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ,
+                      uint32_t samples, uint32_t depth) {
   size_t width = targ->width();
   size_t height = targ->height();
 
@@ -40,8 +43,8 @@ void Renderer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
       glm::vec4 col{};
 
       for (uint32_t sample = 0; sample < samples; ++sample) {
-        rt::ray r = monteCarloRay(m_scene->camera(), x, y, m_rng);
-        col += traceRay(r, 0, depth);
+        rt::path::ray<float> r = monteCarloRay(scene->camera(), x, y, m_rng);
+        col += traceRay(scene, r, 0, depth);
       }
 
       col *= sample_strength;
@@ -52,12 +55,13 @@ void Renderer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
   }
 }
 
-glm::vec4 Renderer::traceRay(const rt::path::ray<float>& r, uint32_t depth,
+glm::vec4 Renderer::traceRay(rt::path::scene* scene,
+                             const rt::path::ray<float>& r, uint32_t depth,
                              uint32_t min_depth) {
-  std::optional<Intersection> intersect = m_scene->calculateIntersection(r);
+  std::optional<Intersection> intersect = scene->calculateIntersection(r);
 
   if (!intersect) {
-    return m_scene->backgroundColor();
+    return scene->background();
   }
 
   if (intersect->material.getType() == EMIT) {

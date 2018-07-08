@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 namespace rt {
+namespace path {
 class RenderTarget {
 public:
   using value_type = unsigned char;
@@ -68,6 +69,9 @@ public:
   virtual void setColor(size_t x, size_t y, const color_type& pixel) override {
     assert(x < m_width);
     assert(y < m_height);
+
+    std::memcpy(&m_pixels[x + y * m_width], &pixel, sizeof(pixel));
   }
 };
+} // namespace path
 } // namespace rt
