@@ -11,7 +11,9 @@ add_executable(rt
 			   renderboy.hpp
 			   setup.hpp
 			   simple.cpp
-			   simple.hpp)
+			   simple.hpp
+			   renderArea.cpp
+			   renderArea.hpp)
 target_link_libraries(rt PRIVATE glm Qt5::Gui Qt5::Widgets rtcore)
 
 add_library(rtcore

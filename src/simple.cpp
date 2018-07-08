@@ -101,7 +101,7 @@ void SimpleScene1::transform()
 {
     this->frameCount++;
 
-    double boxRot = (ulong)(0.0005 * this->timer.elapsed()) % 360;
+    double boxRot = (ulong)(0.0001 * this->timer.elapsed()) % 360;
     tracer.scene->objects[0].setRotation(boxRot, {0.0, 1.0, 0.0});
     tracer.scene->transform();
 }

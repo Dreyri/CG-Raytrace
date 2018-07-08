@@ -20,7 +20,7 @@ void Renderboy::run()
     while (true)
     {
         sc1.transform();
-        QImage img = QImage(640, 480, QImage::Format_RGBA8888);
+        QImage img = QImage(640, 480, QImage::Format_RGB888);
         sc1.render(img);
         emit setImage(img);
     }

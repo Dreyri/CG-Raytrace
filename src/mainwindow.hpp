@@ -19,9 +19,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
-    void setImage(QImage img);
-
 private:
     Ui::MainWindow *ui;
     Renderboy* renderboy;

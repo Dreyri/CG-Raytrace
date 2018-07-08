@@ -12,5 +12,3 @@ find_package(glm REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 add_subdirectory(src)
-enable_testing()
-add_subdirectory(test)
