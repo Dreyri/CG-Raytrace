@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "material.hpp"
+
 namespace rt {
 namespace path {
 struct Intersection {

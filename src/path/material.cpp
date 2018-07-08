@@ -5,9 +5,6 @@
 namespace rt {
 namespace path {
 
-static constexpr float pi() {
-  return std::atan(1.0f) * 4.0f;
-}
 
 Material::Material(MaterialType type, const glm::vec4& color,
                    const glm::vec4& emission)
@@ -49,6 +46,8 @@ rt::ray Material::calculateReflectedRay(const rt::ray& r,
 
     return rt::ray(origin, d);
   }
+
+  throw std::logic_error("shouldn't be able to reach this");
 }
 } // namespace path
 } // namespace rt

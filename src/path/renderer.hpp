@@ -4,10 +4,15 @@
 #include <cstdlib>
 #include <limits>
 
-#include "core/ray.hpp"
+#include "ray.hpp"
 
 namespace rt {
+namespace path {
 class RenderTarget;
+
+static constexpr float pi() {
+  return std::atan(1.0f) * 4.0f;
+}
 
 class Rng {
 public:
@@ -31,12 +36,14 @@ public:
 
 class Renderer {
 private:
-  rt::Rng m_rng;
+  rt::path::Rng m_rng;
 
 public:
   Renderer();
 
   void render(RenderTarget* targ, uint32_t samples = 1, uint32_t depth = 1);
-  glm::vec4 traceRay(const rt::ray& r, uint32_t depth, uint32_t min_depth);
+  glm::vec4 traceRay(const rt::path::ray<float>& r, uint32_t depth,
+                     uint32_t min_depth);
 };
+} // namespace path
 } // namespace rt
