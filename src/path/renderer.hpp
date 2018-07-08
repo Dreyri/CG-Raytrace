@@ -29,12 +29,12 @@ public:
   }
 };
 
-class PathTracer {
+class Renderer {
 private:
   rt::Rng m_rng;
 
 public:
-  PathTracer();
+  Renderer();
 
   void render(RenderTarget* targ, uint32_t samples = 1, uint32_t depth = 1);
   glm::vec4 traceRay(const rt::ray& r, uint32_t depth, uint32_t min_depth);

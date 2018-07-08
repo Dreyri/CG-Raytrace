@@ -1,14 +1,16 @@
-#include "path_tracer.hpp"
+#include "renderer.hpp"
+#include "intersection.hpp"
 
 #include <optional>
 
 namespace rt {
+namespace path {
 
-PathTracer::PathTracer() {
+Renderer::Renderer() {
   m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
 }
 
-void PathTracer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
+void Renderer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
   size_t width = targ->getWidth();
   size_t height = targ->getHeight();
 
@@ -29,8 +31,8 @@ void PathTracer::render(RenderTarget* targ, uint32_t samples, uint32_t depth) {
   }
 }
 
-glm::vec4 PathTracer::traceRay(const rt::ray& r, uint32_t depth,
-                               uint32_t min_depth) {
+glm::vec4 Renderer::traceRay(const rt::ray& r, uint32_t depth,
+                             uint32_t min_depth) {
   std::optional<Intersection> intersect = m_scene->calculateIntersection(r);
 
   if (!intersect) {
@@ -60,8 +62,10 @@ glm::vec4 PathTracer::traceRay(const rt::ray& r, uint32_t depth,
   }
 
   glm::vec3 newray_orig = r.origin + (r.direction * intersect->distance);
-  rt::ray reflected = intersect->material.calculateReflectedRay(r, newray_orig, intersection.normal, m_rng);
+  rt::ray reflected = intersect->material.calculateReflectedRay(
+      r, newray_orig, intersection.normal, m_rng);
 
   return color * traceRay(reflected, depth, min_depth);
 }
+} // namespace path
 } // namespace rt
