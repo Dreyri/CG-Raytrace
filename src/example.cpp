@@ -52,16 +52,14 @@ void setup(std::shared_ptr<rt::Scene> scene)
     bronze->diffuse = { 0.780392, 0.568627, 0.113725 };
     bronze->specular = { 0.992157, 0.941176, 0.807843 };
     bronze->shininess = 27.8974;
-    bronze->reflection = true;
     bronze->reflection_amount = 0.4;
     bronze->transparent = false;
 
     std::shared_ptr<rt::Material> glass = std::make_shared<rt::Material>();
     glass->ambient = { 0.1, 0.1, 0.1 };
-    glass->diffuse = { 0.19, 0.19, 0.19 };
+    glass->diffuse = { 0.1, 0.1, 0.1 };
     glass->specular = { 0.2, 0.2, 0.2 };
-    glass->shininess = 50.0;
-    glass->reflection = true;
+    glass->shininess = 40.0;
     glass->reflection_amount = 0.3;
     glass->transparent = true;
     glass->refraction_amount = 0.7;
@@ -69,11 +67,10 @@ void setup(std::shared_ptr<rt::Scene> scene)
 
     std::shared_ptr<rt::Material> mirror = std::make_shared<rt::Material>();
     mirror->ambient = { 0.2, 0.2, 0.2 };
-    mirror->diffuse = { 0.4, 0.4, 0.4 };
-    mirror->specular = { 0.95, 0.95, 0.95 };
-    mirror->shininess = 5.0;
-    mirror->reflection = true;
-    mirror->reflection_amount = 0.95;
+    mirror->diffuse = { 0.2, 0.2, 0.2 };
+    mirror->specular = { 0.6, 0.6, 0.6 };
+    mirror->shininess = 30.0;
+    mirror->reflection_amount = 1.0;
     mirror->transparent = false;
 
     rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
@@ -94,11 +91,17 @@ void setup(std::shared_ptr<rt::Scene> scene)
     sphere1.setRotation(-20.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(sphere1);
 
-    rt::Object glass1 = rt::Object(rt::Mesh::getUnityCube(), glass);
-    glass1.setPosition({ 4.0, 0.0, 4.0 });
-    glass1.setScale({0.1, 3.0, 3.0});
-    glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
-    //scene->objects.push_back(glass1);
+    rt::Object glass1 = rt::Object(rt::Mesh::getUnitySphere(), glass);
+    glass1.setPosition({ 5.0, 2.0, 3.0 });
+    glass1.setScale({2.0, 2.0, 2.0});
+    //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    scene->objects.push_back(glass1);
+
+    rt::Object glass2 = rt::Object(rt::Mesh::getUnityCube(), glass);
+    glass2.setPosition({ 4.0, 0.0, 4.0 });
+    glass2.setScale({ 0.2, 4.0, 4.0 });
+    //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
+    //scene->objects.push_back(glass2);
 
     rt::Object mirror1 = rt::Object(rt::Mesh::getUnityCube(), mirror);
     mirror1.setPosition({ -5.0, 0.0, 4.0 });
@@ -109,7 +112,7 @@ void setup(std::shared_ptr<rt::Scene> scene)
     rt::Object sphere2 = rt::Object(rt::Mesh::getUnitySphere(), mirror);
     sphere2.setPosition({ -8.0, -4.0, 0.0 });
     sphere2.setScale({ 4.0, 4.0, 4.0 });
-    scene->objects.push_back(sphere2);
+    //scene->objects.push_back(sphere2);
 }
 
 int main(int argc, char** argv)

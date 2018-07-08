@@ -15,6 +15,7 @@ namespace rt
         vec3 n1, n2, n3;
 
         std::shared_ptr<Material> material;
+        int objIndex;
     };
 
     enum MeshType

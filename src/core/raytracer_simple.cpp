@@ -28,7 +28,7 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
     this->scene->camera.setViewpane(width, height);
     this->scene->camera.calculateDerived();
 
-    const unsigned int numThreads = 4;
+    const unsigned int numThreads = 8;
     std::thread t[numThreads];
     
     for (int i = 0; i < numThreads; ++i)
