@@ -47,7 +47,7 @@ void setup(std::shared_ptr<rt::Scene> scene)
     scene->ambient = ambient;
     scene->light = light;
 
-    std::shared_ptr<rt::Material> bronze = std::make_shared<rt::Material>();
+    std::shared_ptr<rt::SimpleMaterial> bronze = std::make_shared<rt::SimpleMaterial>();
     bronze->ambient = { 0.329412, 0.223529, 0.027451 };
     bronze->diffuse = { 0.780392, 0.568627, 0.113725 };
     bronze->specular = { 0.992157, 0.941176, 0.807843 };
@@ -55,7 +55,7 @@ void setup(std::shared_ptr<rt::Scene> scene)
     bronze->reflection_amount = 0.4;
     bronze->transparent = false;
 
-    std::shared_ptr<rt::Material> glass = std::make_shared<rt::Material>();
+    std::shared_ptr<rt::SimpleMaterial> glass = std::make_shared<rt::SimpleMaterial>();
     glass->ambient = { 0.1, 0.1, 0.1 };
     glass->diffuse = { 0.1, 0.1, 0.1 };
     glass->specular = { 0.2, 0.2, 0.2 };
@@ -65,7 +65,7 @@ void setup(std::shared_ptr<rt::Scene> scene)
     glass->refraction_amount = 0.7;
     glass->refraction_index = 1.5;
 
-    std::shared_ptr<rt::Material> mirror = std::make_shared<rt::Material>();
+    std::shared_ptr<rt::SimpleMaterial> mirror = std::make_shared<rt::SimpleMaterial>();
     mirror->ambient = { 0.2, 0.2, 0.2 };
     mirror->diffuse = { 0.2, 0.2, 0.2 };
     mirror->specular = { 0.6, 0.6, 0.6 };

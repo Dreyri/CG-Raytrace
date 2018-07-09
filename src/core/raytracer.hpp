@@ -40,8 +40,8 @@ namespace rt
 
         bool intersectTriangle(Ray& ray, Polygon& poly, floating& t, floating& u, floating& v, floating& w);       
         bool lightVisible(Ray& lightRay);
-        Material& getSurfaceTriangle(const unsigned int polyIndex, const Ray& viewRay, const vec3& intersection, const floating u, const floating v, const floating w, vec3& normal);
-        fColor localLight(Ray& viewRay, const vec3& intersection, const vec3& normal, Material& material);
+        Material& getSurfaceTriangle(const unsigned int polyIndex, const Ray& viewRay, const vec3& intersection, const floating u, const floating v, const floating w, vec3& normal, vec2& uv);
+        fColor localLight(Ray& viewRay, const vec3& intersection, const vec3& normal, Material& material, vec2& uv);
         bool trace(Ray& ray, fColor& out_color, unsigned int depth, floating adpT);
         bool intersectSphere(const Ray& r, const Sphere& sph);
 

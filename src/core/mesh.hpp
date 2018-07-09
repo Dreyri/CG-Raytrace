@@ -13,6 +13,7 @@ namespace rt
     {
         vec3 v1, v2, v3;
         vec3 n1, n2, n3;
+        vec2 uv1, uv2, uv3;
 
         std::shared_ptr<Material> material;
     };

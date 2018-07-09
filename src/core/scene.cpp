@@ -33,6 +33,10 @@ void Scene::transform()
             transformed.n2 = model_rotate * vec4(source.n2, 1.0);
             transformed.n3 = model_rotate * vec4(source.n3, 1.0);
 
+            transformed.uv1 = source.uv1;
+            transformed.uv2 = source.uv2;
+            transformed.uv3 = source.uv3;
+
             transformed.material = object.material;
 
             this->polygons.push_back(transformed);

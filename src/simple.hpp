@@ -37,3 +37,17 @@ public:
     void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider) override;
     void render(QImage& target) override;
 };
+
+class SimpleScene2 : Setup
+{
+private:
+    rt::RaytracerSimple tracer;
+    std::shared_ptr<rt::Scene> scene;
+    QElapsedTimer timer;
+    unsigned int frameCount;
+
+public:
+    void setup() override;
+    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider) override;
+    void render(QImage& target) override;
+};

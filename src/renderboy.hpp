@@ -30,8 +30,6 @@ public slots:
     void setAnimate(bool a);
 
 private:
-    SimpleScene1 sc1;
-
     int depth, slider;
     float adaptive;
     bool smoothing, reflection, refraction, animate;
