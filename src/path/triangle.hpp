@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 #include <glm/glm.hpp>
 
 #include "aabb.hpp"
@@ -46,7 +48,7 @@ struct triangle {
     return (v0 + v1 + v2) / 3.0f;
   }
 
-  std::optional<std::pair<float, glm::vec3>> intersect(rt::path::ray<float>& r,
+  std::optional<std::tuple<float, glm::vec3>> intersect(const rt::path::ray<float>& r,
                                                        float tmin) const {
     glm::vec3 pvec = glm::cross(r.direction, e2);
     float det = glm::dot(e1, pvec);
@@ -76,7 +78,7 @@ struct triangle {
 
     if (t_tmp < tmin) {
       if (t_tmp > 0.0001f) {
-        return std::make_pair(t_tmp, n);
+        return std::make_tuple(t_tmp, n);
       }
     }
 

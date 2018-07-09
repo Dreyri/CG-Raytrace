@@ -47,6 +47,38 @@ public:
       , m_max{max} {
   }
 
+  int longest_axis() const {
+    glm::vec3 diff = m_max - m_min;
+    if (diff.x > diff.y && diff.x > diff.z) {
+      // x longest axis
+      return 0;
+    } else if (diff.y > diff.x && diff.y > diff.z) {
+      // y longest axis
+      return 1;
+    } else {
+      // z longest axis
+      return 2;
+    }
+  }
+
+  AABB& expand(const AABB& other) {
+    if (other.m_min.x < m_min.x) {
+      m_min.x = other.m_min.x;
+    }
+    if (other.m_min.y < m_min.y) {
+      m_min.y = other.m_min.y;
+    }
+
+    if (other.m_max.x > m_max.x) {
+      m_max.x = other.m_max.x;
+    }
+    if (other.m_max.y > m_max.y) {
+      m_max.y = other.m_max.y;
+    }
+
+    return *this;
+  }
+
   /**
    * branchless ray box intersect
    * from https://tavianator.com/fast-branchless-raybounding-box-intersections/

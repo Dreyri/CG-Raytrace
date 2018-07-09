@@ -21,12 +21,15 @@ private:
   MaterialType m_type{DIFFUSE};
   glm::vec4 m_color{1.0f, 1.0f, 1.0f, 1.0f};
   glm::vec4 m_emission{0.0f, 0.0f, 0.0f, 1.0f};
-  std::unique_ptr<rt::path::Image> m_image;
+  std::shared_ptr<rt::path::Image> m_image{nullptr};
   // todo texture
 public:
   Material() = default;
   Material(MaterialType type, const glm::vec3& color,
            const glm::vec3& emission, const std::string& texture = std::string());
+
+  Material(const Material&) = default;
+  Material& operator=(const Material&) = default;
 
   inline MaterialType type() const {
     return m_type;

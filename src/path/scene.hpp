@@ -6,7 +6,7 @@
 #include "aabb.hpp"
 #include "camera.hpp"
 #include "intersection.hpp"
-#include "model.hpp"
+#include "objects.hpp"
 #include "ray.hpp"
 
 namespace rt {

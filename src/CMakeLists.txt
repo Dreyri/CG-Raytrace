@@ -15,7 +15,8 @@ target_link_libraries(rtcore PRIVATE glm)
 
 add_library(rtpath
   path/renderer.cpp
-  path/model.cpp
+  path/objects.cpp
+  path/kdtree.cpp
   path/material.cpp
   path/camera.cpp
 )
