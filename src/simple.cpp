@@ -3,12 +3,12 @@
 void SimpleScene1::setup()
 {
     this->tracer = rt::RaytracerSimple();
-    this->tracer.numThreads = 8;
+    this->tracer.numThreads = 4;
     this->scene = std::make_shared<rt::Scene>(rt::Scene());
     tracer.scene = this->scene;
 
     rt::Camera cam = rt::Camera();
-    cam.position = rt::vec3(8.0, 3.0, 0.0);
+    cam.position = rt::vec3(7.0, 2.0, 0.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.fov = 90;
 
