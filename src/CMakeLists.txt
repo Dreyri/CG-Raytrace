@@ -20,6 +20,7 @@ add_library(rtpath
   path/camera.cpp
 )
 target_link_libraries(rtpath PRIVATE glm)
+target_include_directories(rtpath PUBLIC ${CMAKE_SOURCE_DIR})
 
 if (OPENMP_FOUND)
   message(STATUS "OpenMP found")

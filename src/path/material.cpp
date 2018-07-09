@@ -5,7 +5,6 @@
 namespace rt {
 namespace path {
 
-
 Material::Material(MaterialType type, const glm::vec4& color,
                    const glm::vec4& emission)
     : m_type{type}
@@ -13,10 +12,15 @@ Material::Material(MaterialType type, const glm::vec4& color,
     , m_emission{emission} {
 }
 
-  rt::path::ray<float> Material::calculateReflectedRay(const rt::path::ray<float>& r,
-                                        const glm::vec3& origin,
-                                        const glm::vec3& normal,
-                                        const rt::path::Rng& rng) {
+  glm::vec4 Material::color_at(float u, float v) {
+    if (m_image) {
+      return m_image->at_rel(u, v);
+    }
+  }
+
+rt::path::ray<float> Material::calculateReflectedRay(
+    const rt::path::ray<float>& r, const glm::vec3& origin,
+    const glm::vec3& normal, const rt::path::Rng& rng) {
   if (m_type == SPECULAR) {
     float roughness = 0.8f;
     glm::vec3 reflected =

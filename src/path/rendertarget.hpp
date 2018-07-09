@@ -74,6 +74,23 @@ public:
     return &m_pixels[res * 4];
   }
 
+  glm::vec4 at_rel(float u, float v) const {
+    // convert to x and y
+    size_t x = (std::fmod(std::fabs(u), 1.0f)) * (m_width - 1);
+    size_t y = (1.0f - std::fmod(std::fabs(v), 1.0f)) * (m_height - 1);
+
+    assert(x < m_width);
+    assert(y < m_height);
+
+    float r, g, b;
+
+    r = static_cast<float>(m_pixels[(x + y * m_width) * 4]) / 255.0f;
+    g = static_cast<float>(m_pixels[(x + y * m_width) * 4 + 1]) / 255.0f;
+    b = static_cast<float>(m_pixels[(x + y * m_width) * 4 + 2]) / 255.0f;
+
+    return glm::vec4(r, g, b, 1.0f);
+  }
+
   virtual void setColor(size_t x, size_t y, const color_type& pixel) override {
     assert(x < m_width);
     assert(y < m_height);

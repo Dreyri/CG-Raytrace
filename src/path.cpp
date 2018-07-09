@@ -8,13 +8,6 @@ int main(int argc, char** argv) {
   rt::path::camera cam{glm::vec3(0.0f, -5.0f, 2.5f),
                        glm::vec3(0.0f, 0.0f, 1.0f), 1280, 720};
 
-  std::vector<rt::path::vertex> my_vertices = {
-      rt::path::vertex({-100.0f, -100.0f, 0.0f}),
-      rt::path::vertex({100.0f, -100.0f, 0.0f}),
-      rt::path::vertex({100.0f, 100.0f, 0.0f}),
-      rt::path::vertex({-100.0f, 100.0f, 0.0f})};
-  std::vector<uint32_t> my_indices = {0, 1, 2, 0, 2, 3};
-
   rt::path::mesh<uint32_t> my_mesh{my_vertices, my_indices};
 
   rt::path::Material* my_mat = new rt::path::Material(
