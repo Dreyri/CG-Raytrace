@@ -55,13 +55,20 @@ bool Raytracer::lightVisible(Ray& lightRay)
     auto& polygons = this->scene->polygons;
     auto& light = this->scene->light;
 
+    floating distance = glm::length(lightRay.origin - this->scene->light.position);
     floating t, u, v, w;
 
-    for (auto poly : polygons)
+    for (auto& obj : this->scene->objects)
     {
-        if (intersectTriangle(lightRay, poly, t, u, v, w))
+        if (obj.mesh.type == MeshType::noBounding || intersectSphere(lightRay, obj.bounding))
         {
-            return false;
+            for (unsigned int p = obj.poly_first; p <= obj.poly_last; p++)
+            {
+                if (intersectTriangle(lightRay, polygons[p], t, u, v, w) && t < distance)
+                {
+                    return false;
+                }
+            }
         }
     }
     return true;
