@@ -7,6 +7,9 @@
 int main(int argc, char** argv) {
   rt::path::camera cam{{0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, 400, 300};
 
+  rt::path::camera cam{glm::vec3(0.0f, -5.0f, 2.5f),
+                       glm::vec3(0.0f, 0.0f, 1.0f), 1280, 720};
+
   std::vector<rt::path::vertex> my_vertices = {
       rt::path::vertex({-100.0f, -100.0f, 0.0f}),
       rt::path::vertex({100.0f, -100.0f, 0.0f}),

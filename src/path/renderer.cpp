@@ -31,16 +31,17 @@ static rt::path::ray<float> monteCarloRay(const rt::camera& cam, float x,
 }
 */
 
-Renderer::Renderer() {
+Renderer::Renderer(uint32_t samples, uint32_t depth)
+    : m_samples{samples}
+    , m_depth{depth} {
   m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
 }
 
-void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ,
-                      uint32_t samples, uint32_t depth) {
+void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ) {
   size_t width = targ->width();
   size_t height = targ->height();
 
-  float sample_strength = 1.0f / static_cast<float>(samples);
+  float sample_strength = 1.0f / static_cast<float>(m_samples);
 
   /*
   auto concurrency = std::thread::hardware_concurrency();
@@ -102,9 +103,9 @@ void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ,
     for (size_t x = 0; x < width; ++x) {
       glm::vec4 col{};
 
-      for (uint32_t sample = 0; sample < samples; ++sample) {
+      for (uint32_t sample = 0; sample < m_samples; ++sample) {
         rt::path::ray<float> r = scene->camera().getRay(x, y, m_rng);
-        col += traceRay(scene, r, 0, depth);
+        col += traceRay(scene, r, 0);
       }
 
       col *= sample_strength;
@@ -143,7 +144,7 @@ glm::vec4 Renderer::traceRay(rt::path::scene* scene,
   float rnd = m_rng();
 
   // russian roulette termination after the minimum depth
-  if (++depth > min_depth) {
+  if (++depth > m_depth) {
     if (rnd < (p * 0.9f)) {
       color *= (0.9f / p);
     } else {
@@ -155,7 +156,7 @@ glm::vec4 Renderer::traceRay(rt::path::scene* scene,
   rt::path::ray<float> reflected = intersect->material.calculateReflectedRay(
       r, newray_orig, intersect->normal, m_rng);
 
-  return color + traceRay(scene, reflected, depth, min_depth);
+  return color + traceRay(scene, reflected, depth);
 }
 } // namespace path
 } // namespace rt

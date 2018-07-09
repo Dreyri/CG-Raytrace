@@ -39,13 +39,15 @@ class Renderer {
 private:
   rt::path::Rng m_rng;
 
-public:
-  Renderer();
+  uint32_t m_samples;
+  uint32_t m_depth;
 
-  void render(rt::path::scene* scene, rt::path::RenderTarget* targ,
-              uint32_t samples = 1, uint32_t depth = 1);
+public:
+  Renderer(uint32_t samples, uint32_t depth);
+
+  void render(rt::path::scene* scene, rt::path::RenderTarget* targ);
   glm::vec4 traceRay(rt::path::scene* scene, const rt::path::ray<float>& r,
-                     uint32_t depth, uint32_t min_depth);
+                     uint32_t curr_depth);
 };
 } // namespace path
 } // namespace rt
