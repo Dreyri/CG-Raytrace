@@ -5,13 +5,14 @@
 #include <QImage>
 
 int main(int argc, char** argv) {
-  rt::camera cam{{0.0f, 0.0f, 10.0f}, {}, 60.0f, 400, 300};
+  rt::path::camera cam{{0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, 400, 300};
 
   std::vector<rt::path::vertex> my_vertices = {
       rt::path::vertex({-100.0f, -100.0f, 0.0f}),
       rt::path::vertex({100.0f, -100.0f, 0.0f}),
-      rt::path::vertex({0.0f, 100.0f, 0.0f})};
-  std::vector<uint32_t> my_indices = {0, 1, 2};
+      rt::path::vertex({100.0f, 100.0f, 0.0f}),
+      rt::path::vertex({-100.0f, 100.0f, 0.0f})};
+  std::vector<uint32_t> my_indices = {0, 1, 2, 0, 2, 3};
 
   rt::path::mesh<uint32_t> my_mesh{my_vertices, my_indices};
 

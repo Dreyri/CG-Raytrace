@@ -42,3 +42,4 @@ GPATH
 GRTAGS
 GTAGS
 .clang_complete
+*.png

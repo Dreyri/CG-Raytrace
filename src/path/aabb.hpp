@@ -55,7 +55,7 @@ public:
    */
   inline std::optional<float> intersects(const rt::path::ray<float>& r) const {
     float tx1 = (m_min.x - r.origin.x) / r.direction.x;
-    float tx2 = (m_max.x - r.origin.y) / r.direction.y;
+    float tx2 = (m_max.x - r.origin.x) / r.direction.x;
 
     float tmin = std::min(tx1, tx2);
     float tmax = std::max(tx1, tx2);

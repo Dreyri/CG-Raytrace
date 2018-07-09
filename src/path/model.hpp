@@ -40,22 +40,26 @@ public:
    * interpolated normal and calculated distance
    */
   static std::optional<Intersection>
-  intersectTriangle(rt::path::vertex* triangle, const rt::path::ray<float>& r,
+  intersectTriangle(const rt::path::vertex& v1, const rt::path::vertex& v2,
+                    const rt::path::vertex& v3, const rt::path::ray<float>& r,
                     const glm::mat4& transform) {
-    glm::vec3 pos0 = glm::vec4(triangle[0].position, 1.0f) * transform;
-    glm::vec3 pos1 = glm::vec4(triangle[1].position, 1.0f) * transform;
-    glm::vec3 pos2 = glm::vec4(triangle[2].position, 1.0f) * transform;
+    glm::vec3 pos0 = glm::vec4(v1.position, 1.0f) * transform;
+    glm::vec3 pos1 = glm::vec4(v2.position, 1.0f) * transform;
+    glm::vec3 pos2 = glm::vec4(v3.position, 1.0f) * transform;
     glm::vec3 edge1 = pos1 - pos0;
     glm::vec3 edge2 = pos2 - pos0;
 
-    glm::vec3 tnorm = glm::normalize(glm::cross(edge1, edge2));
+    static constexpr float eps = 0.0001f;
+
+    // TODO: fix properly
+    glm::vec3 tnorm = -glm::normalize(glm::cross(edge1, edge2));
 
     float u, v, t_temp = 0.0f;
 
     glm::vec3 pvec = glm::cross(r.direction, edge2);
     float det = glm::dot(edge1, pvec);
 
-    if (det == 0.0f) {
+    if (std::abs(det) < eps) {
       return {};
     }
     float inv_det = 1.0f / det;
@@ -74,8 +78,8 @@ public:
 
     t_temp = glm::dot(edge2, qvec) * inv_det;
 
-    if (t_temp > 0.0001f) {
-      return Intersection(t_temp, tnorm, triangle[0].color);
+    if (t_temp > eps) {
+      return Intersection(t_temp, tnorm, v1.color);
     }
 
     return {};
@@ -83,13 +87,15 @@ public:
 
   template<typename T>
   std::optional<Intersection> intersect(const rt::path::ray<T>& r) {
-    glm::mat4 transformation;
+    glm::mat4 transformation{1.0f};
     transformation = glm::translate(transformation, m_position);
 
     std::optional<Intersection> intersect;
     for (size_t i = 0; i < std::size(m_mesh.indices); i += 3) {
-      std::optional<Intersection> tmp_intersect =
-          intersectTriangle(&m_mesh.vertices[i], r, transformation);
+      std::optional<Intersection> tmp_intersect = intersectTriangle(
+          m_mesh.vertices[m_mesh.indices[i]],
+          m_mesh.vertices[m_mesh.indices[i + 1]],
+          m_mesh.vertices[m_mesh.indices[i + 2]], r, transformation);
       if (!intersect ||
           (tmp_intersect && tmp_intersect->distance < intersect->distance)) {
         if (m_mat) {

@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <memory>
 
-#include "../core/camera.hpp"
 #include "aabb.hpp"
+#include "camera.hpp"
 #include "intersection.hpp"
 #include "model.hpp"
 #include "ray.hpp"
@@ -13,13 +13,13 @@ namespace rt {
 namespace path {
 class scene {
 private:
-  rt::camera m_camera;
+  rt::path::camera m_camera;
   glm::vec4 m_bg_color;
   std::vector<std::pair<rt::path::AABB, std::shared_ptr<Model>>> m_objects;
 
 public:
   template<template<typename...> typename Container>
-  scene(const rt::camera& cam, const glm::vec4& col,
+  scene(const rt::path::camera& cam, const glm::vec4& col,
         const Container<std::shared_ptr<Model>>& models)
       : m_camera{cam}
       , m_bg_color{col}
@@ -47,7 +47,7 @@ public:
     return res;
   }
 
-  inline const rt::camera& camera() const {
+  inline const rt::path::camera& camera() const {
     return m_camera;
   }
 

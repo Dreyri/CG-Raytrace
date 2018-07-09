@@ -15,6 +15,7 @@
 namespace rt {
 namespace path {
 
+/*
 static rt::path::ray<float> monteCarloRay(const rt::camera& cam, float x,
                                           float y, const rt::path::Rng& rng) {
   // TODO use variance
@@ -28,6 +29,7 @@ static rt::path::ray<float> monteCarloRay(const rt::camera& cam, float x,
 
   return rt::path::ray<float>(cam.position, glm::normalize(dir));
 }
+*/
 
 Renderer::Renderer() {
   m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
@@ -101,7 +103,7 @@ void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ,
       glm::vec4 col{};
 
       for (uint32_t sample = 0; sample < samples; ++sample) {
-        rt::path::ray<float> r = monteCarloRay(scene->camera(), x, y, m_rng);
+        rt::path::ray<float> r = scene->camera().getRay(x, y, m_rng);
         col += traceRay(scene, r, 0, depth);
       }
 
@@ -153,7 +155,7 @@ glm::vec4 Renderer::traceRay(rt::path::scene* scene,
   rt::path::ray<float> reflected = intersect->material.calculateReflectedRay(
       r, newray_orig, intersect->normal, m_rng);
 
-  return color * traceRay(scene, reflected, depth, min_depth);
+  return color + traceRay(scene, reflected, depth, min_depth);
 }
 } // namespace path
 } // namespace rt

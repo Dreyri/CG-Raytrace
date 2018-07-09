@@ -17,6 +17,7 @@ add_library(rtpath
   path/renderer.cpp
   path/model.cpp
   path/material.cpp
+  path/camera.cpp
 )
 target_link_libraries(rtpath PRIVATE glm)
 
