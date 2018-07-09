@@ -37,5 +37,6 @@ namespace rt
 
         static Mesh getUnityCube();
         static Mesh getUnitySphere();
+        static Mesh getXZPlane();
     };
 }

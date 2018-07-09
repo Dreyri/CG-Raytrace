@@ -222,3 +222,65 @@ Mesh Mesh::getUnitySphere()
     mesh.type = MeshType::unitySphere;
     return mesh;
 }
+
+Mesh rt::Mesh::getXZPlane()
+{
+    std::vector<vec3> vertexList{
+        { 1.0, 0.0, -1.0 },
+        { 1.0, 0.0, 1.0 },
+        { -1.0, 0.0, -1.0 },
+        { -1.0, 0.0, 1.0 },
+    };
+
+    std::vector<vec3> normalList{
+        { 0.0, 1.0, 0.0 },
+    };
+
+    std::vector<vec2> uvList{
+        { 0.0 , 0.0 },
+        { 1.0 , 0.0},
+        { 0.0 , 1.0 },
+        { 1.0 , 1.0 },
+    };
+
+    std::vector<glm::uvec3> vertexIndices{
+        { 1, 3, 2 },
+        { 2, 3, 4 },
+    };
+
+    std::vector<glm::uvec3> normalIndixes{
+        { 1, 1, 1 },
+        { 1, 1, 1 },
+    };
+
+    std::vector<glm::uvec3> uvIndixes{
+        { 2, 4, 1 },
+        { 1, 4, 3 },
+    };
+
+
+    Mesh mesh = Mesh();
+
+    for (unsigned int i = 0; i < vertexIndices.size(); i++)
+    {
+        Polygon polygon = Polygon();
+        polygon.v1 = vertexList[vertexIndices[i].x - 1];
+        polygon.v2 = vertexList[vertexIndices[i].y - 1];
+        polygon.v3 = vertexList[vertexIndices[i].z - 1];
+
+        polygon.n1 = normalList[normalIndixes[i].x - 1];
+        polygon.n2 = normalList[normalIndixes[i].y - 1];
+        polygon.n3 = normalList[normalIndixes[i].z - 1];
+
+        polygon.uv1 = uvList[uvIndixes[i].x - 1];
+        polygon.uv2 = uvList[uvIndixes[i].y - 1];
+        polygon.uv3 = uvList[uvIndixes[i].z - 1];
+
+        polygon.material = nullptr;
+
+        mesh.polygons.push_back(polygon);
+    }
+
+    mesh.type = MeshType::noBounding;
+    return mesh;
+}
