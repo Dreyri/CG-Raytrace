@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QThread>
+#include <QElapsedTimer>
+#include <QString>
 
 #include "setup.hpp"
 #include "simple.hpp"

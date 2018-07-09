@@ -19,10 +19,17 @@ void Renderboy::run()
     
     while (true)
     {
+        QElapsedTimer timer;
+        timer.start();
+
         sc1.transform(depth, adaptive, smoothing, reflection, refraction, animate, slider);
+        
         QImage img = QImage(640, 480, QImage::Format_RGB888);
         sc1.render(img);
         emit setImage(img);
+
+
+        emit setFPS(QString::number(1.0 / (timer.elapsed() / 1000.0)));
     }
 }
 
