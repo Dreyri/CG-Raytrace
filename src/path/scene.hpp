@@ -25,9 +25,7 @@ public:
       , m_bg_color{col}
       , m_objects{std::size(models)} {
     std::transform(std::begin(models), std::end(models), std::begin(m_objects),
-                   [](const auto& model) {
-                     AABB aabb{model.mesh.vertices};
-                   });
+                   [](const auto& model) { AABB aabb{model.mesh.vertices}; });
   }
   inline const glm::vec4& background() const {
     return m_bg_color;
@@ -67,8 +65,17 @@ public:
     return res;
   }
 
+  template<typename T>
   inline std::optional<Intersection>
-  calculateIntersection(const rt::path::ray<float>& r) const {
+  calculateIntersection(const rt::path::ray<T>& r) const {
+    Model* m = intersect(r);
+    if (!m) {
+      return {};
+    }
+
+    auto res = m->intersect(r);
+    assert(res);
+    return res;
   }
 };
 } // namespace path

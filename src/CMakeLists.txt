@@ -12,3 +12,15 @@ add_library(rtcore
             core/tracer_sphere.cpp
             core/boundingsphere.cpp)
 target_link_libraries(rtcore PRIVATE glm)
+
+add_library(rtpath
+  path/renderer.cpp
+  path/model.cpp
+  path/material.cpp
+)
+target_link_libraries(rtpath PRIVATE glm)
+
+add_executable(path
+  path.cpp)
+target_link_libraries(path PRIVATE glm rtpath)
+

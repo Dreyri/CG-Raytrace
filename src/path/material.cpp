@@ -13,7 +13,7 @@ Material::Material(MaterialType type, const glm::vec4& color,
     , m_emission{emission} {
 }
 
-rt::ray Material::calculateReflectedRay(const rt::ray& r,
+  rt::path::ray<float> Material::calculateReflectedRay(const rt::path::ray<float>& r,
                                         const glm::vec3& origin,
                                         const glm::vec3& normal,
                                         const rt::path::Rng& rng) {
@@ -27,7 +27,7 @@ rt::ray Material::calculateReflectedRay(const rt::ray& r,
                                  reflected.y + (rng() - 0.5f) * roughness,
                                  reflected.z + (rng() - 0.5f) * roughness));
 
-    return rt::ray(origin, reflected);
+    return rt::path::ray<float>(origin, reflected);
   } else if (m_type == DIFFUSE) {
     glm::vec3 nl =
         glm::dot(normal, r.direction) < 0.0f ? normal : normal * -1.0f;
@@ -44,7 +44,7 @@ rt::ray Material::calculateReflectedRay(const rt::ray& r,
         glm::normalize(u * std::cos(r1) * r2s + v * std::sin(r1) * r2s +
                        w * std::sqrt(1.0f - r2));
 
-    return rt::ray(origin, d);
+    return rt::path::ray<float>(origin, d);
   }
 
   throw std::logic_error("shouldn't be able to reach this");

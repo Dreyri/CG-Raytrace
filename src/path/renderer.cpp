@@ -64,11 +64,11 @@ glm::vec4 Renderer::traceRay(rt::path::scene* scene,
     return scene->background();
   }
 
-  if (intersect->material.getType() == EMIT) {
+  if (intersect->material.type() == EMIT) {
     return intersect->material.emission();
   }
 
-  glm::vec4 color = intersect->material.getColour();
+  glm::vec4 color = intersect->material.color();
 
   // max of all the color elements
   float p = color.r > color.g && color.r > color.b
@@ -82,15 +82,15 @@ glm::vec4 Renderer::traceRay(rt::path::scene* scene,
     if (rnd < (p * 0.9f)) {
       color *= (0.9f / p);
     } else {
-      return intersection->material.emission();
+      return intersect->material.emission();
     }
   }
 
   glm::vec3 newray_orig = r.origin + (r.direction * intersect->distance);
-  rt::ray reflected = intersect->material.calculateReflectedRay(
-      r, newray_orig, intersection.normal, m_rng);
+  rt::path::ray<float> reflected = intersect->material.calculateReflectedRay(
+      r, newray_orig, intersect->normal, m_rng);
 
-  return color * traceRay(reflected, depth, min_depth);
+  return color * traceRay(scene, reflected, depth, min_depth);
 }
 } // namespace path
 } // namespace rt

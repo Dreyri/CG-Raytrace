@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../core/ray.hpp"
+#include "ray.hpp"
 
 namespace rt {
 namespace path {
@@ -39,7 +39,7 @@ public:
     return m_emission;
   }
 
-  rt::ray calculateReflectedRay(const rt::ray& r, const glm::vec3& origin,
+  rt::path::ray<float> calculateReflectedRay(const rt::path::ray<float>& r, const glm::vec3& origin,
                                 const glm::vec3& normal, const Rng& rng);
 };
 } // namespace path
