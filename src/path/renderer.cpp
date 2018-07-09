@@ -37,9 +37,11 @@ Renderer::Renderer(uint32_t samples, uint32_t depth)
   m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
 }
 
-void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ) {
-  size_t width = targ->width();
-  size_t height = targ->height();
+rt::path::Image* Renderer::render(rt::path::scene* scene) {
+  size_t width = scene->camera().width();
+  size_t height = scene->camera().height();
+
+  rt::path::Image* target = new rt::path::Image(nullptr, width, height);
 
   float sample_strength = 1.0f / static_cast<float>(m_samples);
 
@@ -114,16 +116,16 @@ void Renderer::render(rt::path::scene* scene, rt::path::RenderTarget* targ) {
       final_color.g = col.g * 255.0f;
       final_color.b = col.b * 255.0f;
       final_color.a = col.a * 255.0f;
-      targ->setColor(x, y, final_color);
+      target->setColor(x, y, final_color);
     }
 
     printf("%zu out of %zu lines calculated\n", y, height);
   }
+  return target;
 }
 
 glm::vec4 Renderer::traceRay(rt::path::scene* scene,
-                             const rt::path::ray<float>& r, uint32_t depth,
-                             uint32_t min_depth) {
+                             const rt::path::ray<float>& r, uint32_t depth) {
   std::optional<Intersection> intersect = scene->calculateIntersection(r);
 
   if (!intersect) {

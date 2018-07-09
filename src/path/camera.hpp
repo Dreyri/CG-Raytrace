@@ -32,6 +32,14 @@ public:
   camera(const glm::vec3& pos, const glm::vec3& target, size_t width,
          size_t height);
 
+  inline size_t width() const {
+    return m_width;
+  }
+
+  inline size_t height() const {
+    return m_height;
+  }
+
   rt::path::ray<float> getRay(size_t x, size_t y,
                               const rt::path::Rng& rng) const;
 };

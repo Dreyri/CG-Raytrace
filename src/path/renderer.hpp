@@ -6,11 +6,10 @@
 
 #include "ray.hpp"
 #include "scene.hpp"
+#include "rendertarget.hpp"
 
 namespace rt {
 namespace path {
-class RenderTarget;
-
 static constexpr float pi() {
   return std::atan(1.0f) * 4.0f;
 }
@@ -45,7 +44,7 @@ private:
 public:
   Renderer(uint32_t samples, uint32_t depth);
 
-  void render(rt::path::scene* scene, rt::path::RenderTarget* targ);
+  rt::path::Image* render(rt::path::scene* scene);
   glm::vec4 traceRay(rt::path::scene* scene, const rt::path::ray<float>& r,
                      uint32_t curr_depth);
 };

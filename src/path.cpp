@@ -5,8 +5,6 @@
 #include <QImage>
 
 int main(int argc, char** argv) {
-  rt::path::camera cam{{0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, 400, 300};
-
   rt::path::camera cam{glm::vec3(0.0f, -5.0f, 2.5f),
                        glm::vec3(0.0f, 0.0f, 1.0f), 1280, 720};
 
@@ -29,12 +27,13 @@ int main(int argc, char** argv) {
 
   rt::path::scene my_scene{cam, {0.0f, 0.0f, 1.0f, 1.0f}, my_model_vec};
 
-  rt::path::Image my_img{nullptr, 400, 300};
-  rt::path::Renderer my_renderer;
+  rt::path::Renderer my_renderer{5, 5};
 
-  my_renderer.render(&my_scene, &my_img, 15, 15);
+  auto img = my_renderer.render(&my_scene);
 
-  QImage out_img{my_img.pixels(), static_cast<int>(my_img.width()),
-                 static_cast<int>(my_img.height()), QImage::Format_RGBA8888};
+  QImage out_img{img->pixels(), static_cast<int>(img->width()),
+                 static_cast<int>(img->height()), QImage::Format_RGBA8888};
   out_img.save("test.png");
+
+  delete img;
 }
