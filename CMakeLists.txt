@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.6)
 
 project(Raytrace CXX)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
-endif()
+#if(NOT CMAKE_BUILD_TYPE)
+    #set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+#endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -12,6 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(assimp REQUIRED)
 find_package(glm REQUIRED)
 find_package(Qt5 COMPONENTS Core Gui REQUIRED)
+include(FindOpenMP)
 
 add_subdirectory(src)
 enable_testing()

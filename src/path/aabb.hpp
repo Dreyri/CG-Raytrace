@@ -18,6 +18,8 @@ class AABB {
                   std::numeric_limits<float>::min()};
 
 public:
+  constexpr AABB() = default;
+
   template<template<typename...> typename Container>
   explicit AABB(const Container<rt::path::vertex>& vertices) {
     for (const auto& v : vertices) {

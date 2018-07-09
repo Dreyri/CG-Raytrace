@@ -14,8 +14,10 @@ struct mesh {
   std::vector<vertex> vertices;
   std::vector<index_type> indices;
 
-  template<typename ContainerV, typename ContainerI>
-  mesh(const ContainerV& vert, const ContainerI& idx)
+  template<template<typename...> typename ContainerV,
+           template<typename...> typename ContainerI>
+  mesh(const ContainerV<rt::path::vertex>& vert,
+       const ContainerI<uint32_t>& idx)
       : vertices{std::begin(vert), std::end(vert)}
       , indices{std::begin(idx), std::end(idx)} {
   }

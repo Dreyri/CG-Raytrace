@@ -23,9 +23,16 @@ public:
         const Container<std::shared_ptr<Model>>& models)
       : m_camera{cam}
       , m_bg_color{col}
-      , m_objects{std::size(models)} {
-    std::transform(std::begin(models), std::end(models), std::begin(m_objects),
-                   [](const auto& model) { AABB aabb{model.mesh.vertices}; });
+      , m_objects{} {
+    m_objects.resize(std::size(models),
+                     std::pair<rt::path::AABB, std::shared_ptr<Model>>(
+                         rt::path::AABB(), nullptr));
+    std::transform(
+        std::begin(models), std::end(models), std::begin(m_objects),
+        [](auto& model) -> std::pair<rt::path::AABB, std::shared_ptr<Model>> {
+          rt::path::AABB aabb{model->mesh().vertices};
+          return std::make_pair(aabb, model);
+        });
   }
   inline const glm::vec4& background() const {
     return m_bg_color;
@@ -74,7 +81,6 @@ public:
     }
 
     auto res = m->intersect(r);
-    assert(res);
     return res;
   }
 };
