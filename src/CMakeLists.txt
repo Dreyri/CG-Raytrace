@@ -16,11 +16,12 @@ target_link_libraries(rtcore PRIVATE glm)
 add_library(rtpath
   path/renderer.cpp
   path/objects.cpp
+  path/scene.cpp
   path/kdtree.cpp
   path/material.cpp
   path/camera.cpp
 )
-target_link_libraries(rtpath PRIVATE glm)
+target_link_libraries(rtpath PRIVATE glm Qt5::Core Qt5::Gui)
 target_include_directories(rtpath PUBLIC ${CMAKE_SOURCE_DIR})
 
 if (OPENMP_FOUND)

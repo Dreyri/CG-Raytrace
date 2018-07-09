@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include <glm/glm.hpp>
 
@@ -25,8 +25,9 @@ private:
   // todo texture
 public:
   Material() = default;
-  Material(MaterialType type, const glm::vec3& color,
-           const glm::vec3& emission, const std::string& texture = std::string());
+  Material(MaterialType type, const glm::vec3& color, const glm::vec3& emission,
+           const std::shared_ptr<rt::path::Image>& img =
+               std::shared_ptr<rt::path::Image>());
 
   Material(const Material&) = default;
   Material& operator=(const Material&) = default;
@@ -49,8 +50,10 @@ public:
 
   glm::vec4 color_at(float u, float v);
 
-  rt::path::ray<float> calculateReflectedRay(const rt::path::ray<float>& r, const glm::vec3& origin,
-                                const glm::vec3& normal, const Rng& rng);
+  rt::path::ray<float> calculateReflectedRay(const rt::path::ray<float>& r,
+                                             const glm::vec3& origin,
+                                             const glm::vec3& normal,
+                                             const Rng& rng);
 };
 } // namespace path
 } // namespace rt

@@ -67,8 +67,12 @@ mesh::mesh(const glm::vec3& position, const std::string& file_path,
         texture_path = mat.diffuse_texname;
       }
       texture_path = base_path + mat.diffuse_texname;
+      QImage img{};
+      auto qtexpath = QString::fromStdString(texture_path);
+      img.load(qtexpath);
+      auto path_img = std::make_shared<rt::path::Image>(img);
       m_materials.push_back(Material(DIFFUSE, glm::vec3(1.0f, 1.0f, 1.0f),
-                                     glm::vec3(), texture_path));
+                                     glm::vec3(), path_img));
     }
 
     else {

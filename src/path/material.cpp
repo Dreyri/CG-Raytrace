@@ -5,18 +5,22 @@
 namespace rt {
 namespace path {
 
-Material::Material(MaterialType type, const glm::vec4& color,
-                   const glm::vec4& emission)
+Material::Material(MaterialType type, const glm::vec3& color,
+                   const glm::vec3& emission,
+                   const std::shared_ptr<rt::path::Image>& img)
     : m_type{type}
-    , m_color{color}
-    , m_emission{emission} {
+    , m_color{glm::vec4(color, 1.0f)}
+    , m_emission{glm::vec4(emission, 1.0f)}
+    , m_image{img} {
 }
 
-  glm::vec4 Material::color_at(float u, float v) {
-    if (m_image) {
-      return m_image->at_rel(u, v);
-    }
+glm::vec4 Material::color_at(float u, float v) {
+  if (m_image) {
+    return m_image->at_rel(u, v);
   }
+
+  return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+}
 
 rt::path::ray<float> Material::calculateReflectedRay(
     const rt::path::ray<float>& r, const glm::vec3& origin,

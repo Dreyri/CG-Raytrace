@@ -25,7 +25,7 @@ struct KDNode {
    * if hit occurs optional contains
    * distance, color, normal
    */
-  std::optional<std::tuple<float, glm::vec4, glm::vec3> hit(const rt::path::ray<float>& r, float tmin);
+  std::optional<std::tuple<float, glm::vec4, glm::vec3>> hit(const rt::path::ray<float>& r, float tmin);
 
 };
 } // namespace path

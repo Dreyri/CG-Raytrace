@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
+#include <QImage>
 #include <glm/glm.hpp>
 
 namespace rt {
@@ -55,6 +57,10 @@ public:
     if (pixels) {
       std::memcpy(m_pixels, pixels, m_width * m_height * 4);
     }
+  }
+
+  explicit Image(const QImage& img)
+      : Image(img.bits(), img.width(), img.height()) {
   }
 
   ~Image() {

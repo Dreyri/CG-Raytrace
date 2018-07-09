@@ -7,6 +7,7 @@
 #include "intersection.hpp"
 #include "material.hpp"
 #include "ray.hpp"
+#include "triangle.hpp"
 
 #include "third_party/tiny_obj_loader.hpp"
 
