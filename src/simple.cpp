@@ -97,12 +97,26 @@ void SimpleScene1::setup()
     this->frameCount = 0;
 }
 
-void SimpleScene1::transform()
+void SimpleScene1::transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider)
 {
     this->frameCount++;
 
-    double boxRot = (ulong)(0.0001 * this->timer.elapsed()) % 360;
-    tracer.scene->objects[0].setRotation(boxRot, {0.0, 1.0, 0.0});
+    tracer.maxDepth = depth;
+    tracer.adaptiveDepth = adaptive;
+    tracer.smoothing = smoothing;
+    tracer.reflection = reflection;
+    tracer.refraction = refraction;
+
+    if (animation)
+    {
+        double boxRot = (ulong)(0.01 * this->timer.elapsed()) % 360;
+        tracer.scene->objects[0].setRotation(glm::radians(boxRot), {0.0, 1.0, 0.0});
+    }
+    else
+    {
+        tracer.scene->objects[0].setRotation(glm::radians((double)slider), { 0.0, 1.0, 0.0 });
+    }
+    
     tracer.scene->transform();
 }
 

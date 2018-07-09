@@ -16,8 +16,22 @@ public:
 
 signals:
     void setImage(QImage img);
+    void setFPS(QString fps);
+
+public slots:
+    void setDepth(int depth);
+    void setSlider(int slider);
+    void setAdaptive(float adaptive);
+    void setSmoothing(bool s);
+    void setReflection(bool r);
+    void setRefraction(bool r);
+    void setAnimate(bool a);
 
 private:
     SimpleScene1 sc1;
+
+    int depth, slider;
+    float adaptive;
+    bool smoothing, reflection, refraction, animate;
 };
 

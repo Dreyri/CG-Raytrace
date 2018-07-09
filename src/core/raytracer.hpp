@@ -31,7 +31,10 @@ namespace rt
         std::shared_ptr<Scene> scene;
 
         unsigned int maxDepth;
-        floating adaptiveDepth;
+        double adaptiveDepth;
+        bool smoothing;
+        bool reflection;
+        bool refraction;
 
         Raytracer();
 

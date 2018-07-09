@@ -69,7 +69,15 @@ bool Raytracer::lightVisible(Ray& lightRay)
 
 Material& Raytracer::getSurfaceTriangle(const unsigned int polyIndex, const Ray & viewRay, const vec3 & intersection, const floating u, const floating v, const floating w, vec3 & normal)
 {
-    normal = glm::normalize((this->scene->polygons[polyIndex].n1 * w) + (this->scene->polygons[polyIndex].n2 * u) + (this->scene->polygons[polyIndex].n3 * v));
+    if (smoothing)
+    {
+        normal = glm::normalize((this->scene->polygons[polyIndex].n1 * w) + (this->scene->polygons[polyIndex].n2 * u) + (this->scene->polygons[polyIndex].n3 * v));
+    }
+    else
+    {
+        Polygon& poly = this->scene->polygons[polyIndex];
+        normal = glm::normalize(glm::cross(poly.v1 - poly.v2, poly.v1 - poly.v3));
+    }    
     return *this->scene->polygons[polyIndex].material;
 }
 
@@ -174,7 +182,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         }
 
         // Reflection
-        if (adaptiveReflection > this->adaptiveDepth)
+        if (this->reflection && adaptiveReflection > this->adaptiveDepth)
         {
             vec3 reflectVector = glm::reflect(viewVector, outNormal);
             if (trace(rt::Ray(intersection, reflectVector), reflectColor, depth + 1, adaptiveReflection))
@@ -188,7 +196,7 @@ bool Raytracer::trace(Ray& ray, fColor& out_color, unsigned int depth, floating 
         }
 
         // Refraction
-        if(polygons[closestIndex].material->transparent && adaptiveRefraction > this->adaptiveDepth)
+        if(polygons[closestIndex].material->transparent && this->refraction  && adaptiveRefraction > this->adaptiveDepth)
         {
             vec3 refractVector = glm::refract(viewVector, outNormal, glm::clamp(outsideDensity / insideDensity, -1.0, 1.0));
             if (trace(rt::Ray(intersection + (0.1*refractVector), refractVector), refractColor, depth + 1, adaptiveRefraction))

@@ -19,6 +19,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void resetControls();
+
 private:
     Ui::MainWindow *ui;
     Renderboy* renderboy;

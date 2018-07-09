@@ -34,6 +34,6 @@ private:
 
 public:
     void setup() override;
-    void transform() override;
+    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider) override;
     void render(QImage& target) override;
 };
