@@ -44,6 +44,7 @@ namespace rt
         fColor localLight(Ray& viewRay, const vec3& intersection, const vec3& normal, Material& material, vec2& uv);
         bool trace(Ray& ray, fColor& out_color, unsigned int depth, floating adpT);
         bool intersectSphere(const Ray& r, const Sphere& sph);
+        bool intersectSphereAnywhere(const Ray & r, const Sphere & sph);
 
         virtual void render(std::shared_ptr<rt::RenderTarget> target) = 0;
     };
