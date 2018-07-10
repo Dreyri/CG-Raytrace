@@ -1,6 +1,8 @@
 #include "scene.hpp"
 #include "objects.hpp"
 
+#include "renderer.hpp"
+
 namespace rt {
 namespace path {
 
@@ -24,26 +26,18 @@ ObjectIntersection Scene::intersect(const Ray& ray) {
   return isct;
 }
 
-glm::dvec3 Scene::trace_ray(const Ray& ray, int depth, unsigned short* Xi) {
+glm::dvec3 Scene::trace_ray(const Ray& ray, int depth, const Rng& rng) {
 
   ObjectIntersection isct = intersect(ray);
 
   // If no hit, return world colour
   if (!isct.hit)
     return glm::dvec3();
-  /*if (!isct.hit){
-      double u, v;
-      v = (acos(glm::dvec3(0,0,1).dot(ray.direction))/M_PI);
-      u = (acos(ray.direction.y)/ M_PI);
-      return bg.get_pixel(fabs(u), fabs(v))*1.2;
-  }*/
 
   if (isct.m.get_type() == EMIT)
     return isct.m.get_emission();
-  // glm::dvec3 x = ray.origin + ray.direction * isct.u;
 
   glm::dvec3 colour = isct.m.get_colour();
-  // return colour * isct.n.dot((glm::dvec3(1,-3,8)-x).norm());
 
   // Calculate max reflection
   double p = colour.x > colour.y && colour.x > colour.z
@@ -53,7 +47,7 @@ glm::dvec3 Scene::trace_ray(const Ray& ray, int depth, unsigned short* Xi) {
   // Russian roulette termination.
   // If random number between 0 and 1 is > p, terminate and return hit object's
   // emmission
-  double rnd = erand48(Xi);
+  double rnd = rng();
   if (++depth > 5) {
     if (rnd <
         p * 0.9) { // Multiply by 0.9 to avoid infinite loop with colours of 1.0
@@ -64,9 +58,9 @@ glm::dvec3 Scene::trace_ray(const Ray& ray, int depth, unsigned short* Xi) {
   }
 
   glm::dvec3 x = ray.origin + ray.direction * isct.u;
-  Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, Xi);
+  Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, rng);
 
-  return colour * (trace_ray(reflected, depth, Xi));
+  return colour * (trace_ray(reflected, depth, rng));
 }
 } // namespace path
 } // namespace rt

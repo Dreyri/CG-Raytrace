@@ -1,6 +1,7 @@
 #include "camera.hpp"
 
 #include "ray.hpp"
+#include "renderer.hpp"
 
 namespace rt {
 namespace path {
@@ -32,15 +33,15 @@ int Camera::get_height() {
 }
 
 // Returns ray from camera origin through pixel at x,y
-Ray Camera::get_ray(int x, int y, bool jitter, unsigned short* Xi) {
+Ray Camera::get_ray(int x, int y, bool jitter, const Rng& rng) {
 
   double x_jitter;
   double y_jitter;
 
   // If jitter == true, jitter point for anti-aliasing
   if (jitter) {
-    x_jitter = (erand48(Xi) * m_x_spacing) - m_x_spacing_half;
-    y_jitter = (erand48(Xi) * m_y_spacing) - m_y_spacing_half;
+    x_jitter = (rng() * m_x_spacing) - m_x_spacing_half;
+    y_jitter = (rng() * m_y_spacing) - m_y_spacing_half;
 
   } else {
     x_jitter = 0;

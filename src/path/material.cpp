@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "ray.hpp"
+#include "renderer.hpp"
 
 namespace rt {
 namespace path {
@@ -32,22 +33,22 @@ glm::dvec3 Material::get_emission() const {
 }
 
 Ray Material::get_reflected_ray(const Ray& r, glm::dvec3& p,
-                                const glm::dvec3& n, unsigned short* Xi) const {
+                                const glm::dvec3& n, const Rng& rng) const {
   // Ideal specular reflection
   if (m_type == SPEC) {
     double roughness = 0.8;
     glm::dvec3 reflected = r.direction - n * 2.0 * glm::dot(n, r.direction);
-    reflected = glm::normalize(
-        glm::dvec3(reflected.x + (erand48(Xi) - 0.5) * roughness,
-                   reflected.y + (erand48(Xi) - 0.5) * roughness,
-                   reflected.z + (erand48(Xi) - 0.5) * roughness));
+    reflected =
+        glm::normalize(glm::dvec3(reflected.x + (rng() - 0.5) * roughness,
+                                  reflected.y + (rng() - 0.5) * roughness,
+                                  reflected.z + (rng() - 0.5) * roughness));
 
     return Ray(p, reflected);
   }
   // Ideal diffuse reflection
   if (m_type == DIFF) {
     glm::dvec3 nl = glm::dot(n, r.direction) < 0 ? n : n * -1.0;
-    double r1 = 2 * M_PI * erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+    double r1 = 2 * M_PI * rng(), r2 = rng(), r2s = sqrt(r2);
     glm::dvec3 w = nl,
                u = glm::normalize(
                    (fabs(w.x) > .1 ? glm::dvec3(0.0, 1.0, 0.0)

@@ -9,7 +9,7 @@
 
 namespace rt {
 namespace path {
-
+class Rng;
 enum MaterialType { DIFF, SPEC, EMIT };
 
 class Material {
@@ -28,7 +28,7 @@ public:
   glm::dvec3 get_colour_at(double u, double v) const;
   glm::dvec3 get_emission() const;
   Ray get_reflected_ray(const Ray& r, glm::dvec3& p, const glm::dvec3& n,
-                        unsigned short* Xi) const;
+                        const Rng& rng) const;
 };
 } // namespace path
 } // namespace rt

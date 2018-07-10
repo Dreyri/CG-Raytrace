@@ -4,6 +4,7 @@
 
 namespace rt {
 namespace path {
+class Rng;
 
 class Camera {
 
@@ -26,7 +27,7 @@ public:
   Camera(glm::dvec3 position, glm::dvec3 target, int width, int height);
   int get_width();
   int get_height();
-  Ray get_ray(int x, int y, bool jitter, unsigned short* Xi);
+  Ray get_ray(int x, int y, bool jitter, const Rng& rng);
 };
 } // namespace path
 } // namespace rt

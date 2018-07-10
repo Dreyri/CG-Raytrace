@@ -33,7 +33,9 @@ void Renderer::render(int samples) {
 // Main Loop
 #pragma omp parallel for schedule(dynamic, 1) // OpenMP
   for (int y = 0; y < height; y++) {
-    unsigned short Xi[3] = {0, 0, y * y * y}; // Stores seed for erand48
+    //unsigned short Xi[3] = {0, 0, y * y * y}; // Stores seed for erand48
+    Rng rng;
+    rng.seed(4);
 
     fprintf(stderr, "\rRendering (%i samples): %.2f%% ", // Prints
             samples, (double)y / height * 100);          // progress
@@ -42,8 +44,8 @@ void Renderer::render(int samples) {
       glm::dvec3 col = glm::dvec3();
 
       for (int a = 0; a < samples; a++) {
-        Ray ray = m_camera->get_ray(x, y, a > 0, Xi);
-        col = col + m_scene->trace_ray(ray, 0, Xi);
+        Ray ray = m_camera->get_ray(x, y, a > 0, rng);
+        col = col + m_scene->trace_ray(ray, 0, rng);
       }
 
       m_pixel_buffer[(y)*width + x] = col * samples_recp;

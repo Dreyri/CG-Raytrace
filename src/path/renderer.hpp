@@ -5,6 +5,22 @@
 
 namespace rt {
 namespace path {
+struct Rng {
+  Rng() {
+  }
+
+  void seed(int seed) {
+    srand(seed);
+  }
+
+  /**
+   * random number between 0.0 and 1.0
+   */
+  inline double operator()() const {
+    return static_cast<double>(rand()) /
+           static_cast<double>(std::numeric_limits<int>::max());
+  }
+};
 class Renderer {
 private:
   Scene* m_scene;
