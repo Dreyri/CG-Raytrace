@@ -25,7 +25,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->cbReflection, &QCheckBox::toggled, renderboy, &Renderboy::setReflection);
     connect(ui->cbRefraction, &QCheckBox::toggled, renderboy, &Renderboy::setRefraction);
     connect(ui->cbAnimate, &QCheckBox::toggled, renderboy, &Renderboy::setAnimate);
+    connect(ui->dsIndex, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), renderboy, &Renderboy::setRI);
+    connect(ui->hsVertical, &QSlider::valueChanged, renderboy, &Renderboy::setCamV);
+    connect(ui->hsHorizontal, &QSlider::valueChanged, renderboy, &Renderboy::setCamH);
+    connect(ui->ra, &RenderArea::setSize, renderboy, &Renderboy::setSize);
 
+    resetControls();
     this->renderboy->start();
     resetControls();
 }
@@ -44,5 +49,8 @@ void MainWindow::resetControls()
     ui->cbSmoothing->setChecked(true);
     ui->cbReflection->setChecked(true);
     ui->cbRefraction->setChecked(true);
-    ui->cbAnimate->setChecked(true);
+    ui->cbAnimate->setChecked(false);
+    ui->dsIndex->setValue(1.5);
+    ui->hsVertical->setValue(0);
+    ui->hsHorizontal->setValue(0);
 }

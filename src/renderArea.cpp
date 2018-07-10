@@ -13,6 +13,11 @@ void RenderArea::paintEvent(QPaintEvent * event)
     painter.drawImage(QPoint(0, 0), current);
 }
 
+void RenderArea::resizeEvent(QResizeEvent * event)
+{
+    emit setSize(this->width(), this->height());
+}
+
 void RenderArea::setImage(QImage img)
 {
     current = img;

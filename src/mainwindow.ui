@@ -6,20 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>816</width>
+    <width>821</width>
     <height>500</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>816</width>
-    <height>500</height>
+    <width>1920</width>
+    <height>1080</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Raytracer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="baseSize">
+    <size>
+     <width>821</width>
+     <height>500</height>
+    </size>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <layout class="QHBoxLayout" name="hlMain">
@@ -27,7 +33,7 @@
        <widget class="QGroupBox" name="vbControls">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>155</width>
           <height>0</height>
          </size>
         </property>
@@ -78,7 +84,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QSpinBox" name="sbDepth"/>
+            <widget class="QSpinBox" name="sbDepth">
+             <property name="maximum">
+              <number>16</number>
+             </property>
+             <property name="value">
+              <number>8</number>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
@@ -88,7 +101,17 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="sbAdaptive"/>
+            <widget class="QDoubleSpinBox" name="sbAdaptive">
+             <property name="maximum">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.050000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.050000000000000</double>
+             </property>
+            </widget>
            </item>
            <item row="2" column="0" colspan="2">
             <widget class="QCheckBox" name="cbSmoothing">
@@ -111,20 +134,6 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="0" colspan="2">
-            <widget class="QPushButton" name="rbReset">
-             <property name="text">
-              <string>Reset</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QCheckBox" name="cbAnimate">
-             <property name="text">
-              <string>Animate</string>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="0">
             <widget class="Line" name="line">
              <property name="frameShadow">
@@ -138,7 +147,14 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="0" colspan="2">
+           <item row="6" column="0">
+            <widget class="QCheckBox" name="cbAnimate">
+             <property name="text">
+              <string>Animate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0" colspan="2">
             <widget class="QSlider" name="hsValue">
              <property name="maximum">
               <number>360</number>
@@ -146,6 +162,77 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+            </widget>
+           </item>
+           <item row="11" column="0" colspan="2">
+            <widget class="QPushButton" name="rbReset">
+             <property name="text">
+              <string>Reset</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QDoubleSpinBox" name="dsIndex">
+             <property name="decimals">
+              <number>1</number>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>9.900000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.500000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Brechungsindex</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0" colspan="2">
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string>Kamera</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QSlider" name="hsVertical">
+                <property name="minimum">
+                 <number>-80</number>
+                </property>
+                <property name="maximum">
+                 <number>80</number>
+                </property>
+                <property name="singleStep">
+                 <number>1</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="hsHorizontal">
+                <property name="minimum">
+                 <number>-80</number>
+                </property>
+                <property name="maximum">
+                 <number>80</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -168,19 +255,19 @@
       </item>
       <item>
        <widget class="RenderArea" name="ra" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
-          <width>640</width>
-          <height>480</height>
+          <width>320</width>
+          <height>240</height>
          </size>
         </property>
         <property name="maximumSize">
+         <size>
+          <width>1920</width>
+          <height>1080</height>
+         </size>
+        </property>
+        <property name="baseSize">
          <size>
           <width>640</width>
           <height>480</height>

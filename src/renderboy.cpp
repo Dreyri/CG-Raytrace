@@ -2,9 +2,8 @@
 
 #include <iostream>
 
-Renderboy::Renderboy()
+Renderboy::Renderboy() : camH{0}, camV{0}, ri{1.5}, depth{8}, winW{640}, winH{480}
 {
-
 }
 
 Renderboy::~Renderboy()
@@ -23,9 +22,9 @@ void Renderboy::run()
         QElapsedTimer timer;
         timer.start();
 
-        sc1.transform(depth, adaptive, smoothing, reflection, refraction, animate, slider);
+        sc1.transform(depth, adaptive, smoothing, reflection, refraction, animate, slider, ri, camH, camV);
         
-        QImage img = QImage(640, 480, QImage::Format_RGB888);
+        QImage img = QImage(winW, winH, QImage::Format_RGB888);
         sc1.render(img);
         emit setImage(img);
 
@@ -67,4 +66,25 @@ void Renderboy::setRefraction(bool r)
 void Renderboy::setAnimate(bool a)
 {
     animate = a;
+}
+
+void Renderboy::setCamH(int h)
+{
+    camH = h;
+}
+
+void Renderboy::setCamV(int v)
+{
+    camV = v;
+}
+
+void Renderboy::setRI(double ri)
+{
+    this->ri = ri;
+}
+
+void Renderboy::setSize(int w, int h)
+{
+    winH = h;
+    winW = w;
 }

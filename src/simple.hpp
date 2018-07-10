@@ -51,7 +51,7 @@ private:
 
 public:
     void setup() override;
-    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider) override;
+    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider, double index, int camHorizontal, int camVertical) override;
     void render(QImage& target) override;
 };
 
@@ -65,6 +65,6 @@ private:
 
 public:
     void setup() override;
-    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider) override;
+    void transform(unsigned int depth, float adaptive, bool smoothing, bool reflection, bool refraction, bool animation, int slider, double index, int camHorizontal, int camVertical) override;
     void render(QImage& target) override;
 };

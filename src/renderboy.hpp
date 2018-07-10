@@ -28,10 +28,15 @@ public slots:
     void setReflection(bool r);
     void setRefraction(bool r);
     void setAnimate(bool a);
+    void setCamH(int h);
+    void setCamV(int v);
+    void setRI(double ri);
+    void setSize(int w, int h);
 
 private:
-    int depth, slider;
+    int depth, slider, camH, camV, winH, winW;
     float adaptive;
     bool smoothing, reflection, refraction, animate;
+    double ri;
 };
 
