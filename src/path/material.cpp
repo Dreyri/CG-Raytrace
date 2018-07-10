@@ -14,12 +14,11 @@ Material::Material(MaterialType type, const glm::vec3& color,
     , m_image{img} {
 }
 
-glm::vec4 Material::color_at(float u, float v) {
+glm::vec4 Material::color_at(float u, float v) const {
   if (m_image) {
     return m_image->at_rel(u, v);
   }
-
-  return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  return m_color;
 }
 
 rt::path::ray<float> Material::calculateReflectedRay(

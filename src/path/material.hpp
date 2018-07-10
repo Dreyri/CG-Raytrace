@@ -25,7 +25,9 @@ private:
   // todo texture
 public:
   Material() = default;
-  Material(MaterialType type, const glm::vec3& color, const glm::vec3& emission,
+  Material(MaterialType type,
+           const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f),
+           const glm::vec3& emission = glm::vec3{0.0f, 0.0f, 0.0f},
            const std::shared_ptr<rt::path::Image>& img =
                std::shared_ptr<rt::path::Image>());
 
@@ -40,15 +42,11 @@ public:
     return m_color;
   }
 
-  inline glm::vec4 color_at(float u, float v) const {
-    return {1.0f, 0.0f, 0.0f, 1.0f};
-  }
-
   inline const glm::vec4& emission() const {
     return m_emission;
   }
 
-  glm::vec4 color_at(float u, float v);
+  glm::vec4 color_at(float u, float v) const;
 
   rt::path::ray<float> calculateReflectedRay(const rt::path::ray<float>& r,
                                              const glm::vec3& origin,

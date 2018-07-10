@@ -18,7 +18,6 @@ private:
   std::vector<rt::path::object*> m_objects;
 
 public:
-  template<template<typename...> typename Container>
   scene(const rt::path::camera& cam, const glm::vec4& col)
       : m_camera{cam}
       , m_bg_color{col}
@@ -32,7 +31,12 @@ public:
     return m_camera;
   }
 
-  glm::vec4 trace_ray(const rt::path::ray<float>& r, uint32_t depth, const rt::path::Rng& rng);
+  inline void add(rt::path::object* obj) {
+    m_objects.push_back(obj);
+  }
+
+  glm::vec4 trace_ray(const rt::path::ray<float>& r, uint32_t depth,
+                      const rt::path::Rng& rng);
 
   std::optional<Intersection>
   calculateIntersection(const rt::path::ray<float>& r) const;

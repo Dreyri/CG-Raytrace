@@ -45,69 +45,14 @@ rt::path::Image* Renderer::render(rt::path::scene* scene) {
 
   float sample_strength = 1.0f / static_cast<float>(m_samples);
 
-  /*
-  auto concurrency = std::thread::hardware_concurrency();
-  std::vector<std::thread> worker_threads;
-  std::vector<std::pair<size_t, size_t>> lines_thread;
-  size_t lines_per_thread = height / concurrency;
-
-  for (size_t i = 0; i < concurrency; ++i) {
-    if ((i + 1) == concurrency) {
-      lines_thread.push_back(std::make_pair(
-          i * lines_per_thread, lines_per_thread + (height % lines_per_thread) +
-                                    (i * lines_per_thread)));
-      std::cout << "Thread " << i << " {stop: "
-                << (lines_per_thread + (height % lines_per_thread)) +
-                       (i * lines_per_thread)
-                << ", start: " << i * lines_per_thread << "}\n";
-    } else {
-      lines_thread.push_back(std::make_pair(
-          i * lines_per_thread, lines_per_thread + i * lines_per_thread));
-      std::cout << "Thread " << i
-                << " {stop: " << lines_per_thread + (i * lines_per_thread)
-                << ", start: " << i * lines_per_thread << "}\n";
-    }
-  }
-  worker_threads.reserve(concurrency);
-
-  for (size_t i = 0; i < concurrency; ++i) {
-
-    worker_threads.push_back(std::thread([=]() {
-      for (size_t y = lines_thread[i].first; y < lines_thread[i].second; ++y) {
-        for (size_t x = 0; x < width; ++x) {
-          glm::vec4 col{};
-
-          for (uint32_t sample = 0; sample < samples; ++sample) {
-            rt::path::ray<float> r =
-                monteCarloRay(scene->camera(), x, y, m_rng);
-            col += traceRay(scene, r, 0, depth);
-          }
-
-          col *= sample_strength;
-          glm::tvec4<unsigned char> final_color;
-          final_color.x = col.x * 255.0f;
-          final_color.y = col.y * 255.0f;
-          final_color.z = col.z * 255.0f;
-          final_color.w = col.w * 255.0f;
-          targ->setColor(x, y, col);
-        }
-
-        printf("%zu out of %zu lines calculated\n", y, height);
-      }
-    }));
-
-  }
-  for (auto& thread : worker_threads) {
-    thread.join();
-  }
-  */
+#pragma omp parallel for
   for (size_t y = 0; y < height; ++y) {
     for (size_t x = 0; x < width; ++x) {
       glm::vec4 col{};
 
       for (uint32_t sample = 0; sample < m_samples; ++sample) {
         rt::path::ray<float> r = scene->camera().getRay(x, y, m_rng);
-        col += traceRay(scene, r, 0);
+        col += scene->trace_ray(r, 0, m_rng);
       }
 
       col *= sample_strength;

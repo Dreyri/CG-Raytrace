@@ -11,7 +11,7 @@
 namespace rt {
 namespace path {
 static constexpr float pi() {
-  return std::atan(1.0f) * 4.0f;
+  return M_PI;
 }
 
 class Rng {

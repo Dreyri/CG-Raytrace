@@ -43,6 +43,10 @@ sphere::calculate_intersection(const rt::path::ray<float>& r) {
 mesh::mesh(const glm::vec3& position, const std::string& file_path,
            rt::path::Material mat)
     : object(position)
+    , m_tshapes{}
+    , m_tmaterials{}
+    , m_materials{}
+    , m_triangles{}
     , m_material{mat} {
   std::cout << "Loading '" << file_path << "'\n";
 
@@ -124,17 +128,43 @@ mesh::mesh(const glm::vec3& position, const std::string& file_path,
                 .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 2] * 2],
             m_tshapes[i]
                 .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 2] * 2 + 1]);
+      }
 
-        if (m_tshapes[i].mesh.material_ids[j] < std::size(m_materials)) {
-          m_triangles.push_back(
-              triangle(v0, v1, v2, t0, t1, t2,
-                       &m_materials[m_tshapes[i].mesh.material_ids[j]]));
-        } else {
-          m_triangles.push_back(triangle(v0, v1, v2, t0, t1, t2, &m_material));
-        }
+      if (m_tshapes[i].mesh.material_ids[j] >= 0 &&
+          m_tshapes[i].mesh.material_ids[j] <
+              static_cast<int>(std::size(m_materials))) {
+        m_triangles.push_back(
+            new triangle(v0, v1, v2, t0, t1, t2,
+                         &m_materials[m_tshapes[i].mesh.material_ids[j]]));
+      } else {
+        m_triangles.push_back(
+            new triangle(v0, v1, v2, t0, t1, t2, &m_material));
       }
     }
   }
+
+  m_tshapes.clear();
+  m_tshapes.shrink_to_fit();
+  m_tmaterials.clear();
+  m_tmaterials.shrink_to_fit();
+
+  m_node = KDNode::build(m_triangles, 0);
+}
+
+std::optional<Intersection>
+mesh::calculate_intersection(const rt::path::ray<float>& r) {
+  float tmin = std::numeric_limits<float>::max();
+
+  auto intersect = m_node->hit(r, tmin);
+
+  if (intersect) {
+    float dist = std::get<float>(*intersect);
+    glm::vec4 col = std::get<glm::vec4>(*intersect);
+    glm::vec3 normal = std::get<glm::vec3>(*intersect);
+    return Intersection(dist, normal, Material(DIFFUSE, col));
+  }
+
+  return {};
 }
 } // namespace path
 } // namespace rt

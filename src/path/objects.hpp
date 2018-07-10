@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "intersection.hpp"
+#include "kdtree.hpp"
 #include "material.hpp"
 #include "ray.hpp"
 #include "triangle.hpp"
@@ -26,7 +27,7 @@ public:
   calculate_intersection(const rt::path::ray<float>& r) = 0;
 };
 
-class sphere : public object {
+class sphere final : public object {
 private:
   float m_radius;
   rt::path::Material m_material;
@@ -46,15 +47,15 @@ public:
   calculate_intersection(const rt::path::ray<float>& r) override;
 };
 
-class mesh : public object {
+class mesh final : public object {
 private:
   std::vector<tinyobj::shape_t> m_tshapes;
   std::vector<tinyobj::material_t> m_tmaterials;
   std::vector<rt::path::Material> m_materials;
-  std::vector<rt::path::triangle> m_triangles;
+  std::vector<rt::path::triangle*> m_triangles;
 
   rt::path::Material m_material;
-  // TODO KDNode
+  KDNode* m_node;
 
 public:
   mesh(const glm::vec3& position, const std::string& file_path,

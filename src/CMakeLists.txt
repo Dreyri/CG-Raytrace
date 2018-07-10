@@ -20,6 +20,7 @@ add_library(rtpath
   path/kdtree.cpp
   path/material.cpp
   path/camera.cpp
+  ../third_party/tiny_obj_loader.cpp
 )
 target_link_libraries(rtpath PRIVATE glm Qt5::Core Qt5::Gui)
 target_include_directories(rtpath PUBLIC ${CMAKE_SOURCE_DIR})

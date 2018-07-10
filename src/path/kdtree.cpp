@@ -77,6 +77,7 @@ KDNode* KDNode::build(const std::vector<triangle*>& tris, int depth) {
 
   return node;
 }
+
 std::optional<std::tuple<float, glm::vec4, glm::vec3>>
 KDNode::hit(const rt::path::ray<float>& r, float tmin) {
   auto dist = box.intersects(r);
