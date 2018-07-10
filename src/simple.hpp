@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QImage>
+#include <QColor>
 #include <QThread>
 #include <QElapsedTimer>
 
@@ -21,6 +22,22 @@ public:
     {
         this->image.setPixelColor(w, h, { (int)(255 * r), (int)(255 * g), (int)(255 * b) });
     }
+};
+
+class ImageTexture : public rt::Texture
+{
+public:
+    ImageTexture(QImage img) : img{ img } {}
+    int getWidth() override { return img.width(); }
+    int getHeight() override { return img.height(); }
+    rt::fColor getColor(int u, int v) override
+    {
+        QColor c = img.pixelColor(v, img.height() - 1 - u);
+        return rt::fColor(c.redF(), c.greenF(), c.blueF());
+    }
+
+private:
+    QImage img;
 };
 
 

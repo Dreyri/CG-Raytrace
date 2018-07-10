@@ -29,7 +29,7 @@ public:
 void setup(std::shared_ptr<rt::Scene> scene)
 {
     rt::Camera cam = rt::Camera();
-    cam.position = rt::vec3(10.0, 3.0, 0.0);
+    cam.position = rt::vec3(10.0, 3.5, 0.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.fov = 90;
 
@@ -65,60 +65,52 @@ void setup(std::shared_ptr<rt::Scene> scene)
     glass->refraction_amount = 0.7;
     glass->refraction_index = 1.5;
 
-    std::shared_ptr<rt::SimpleMaterial> mirror = std::make_shared<rt::SimpleMaterial>();
-    mirror->ambient = { 0.2, 0.2, 0.2 };
-    mirror->diffuse = { 0.2, 0.2, 0.2 };
-    mirror->specular = { 0.6, 0.6, 0.6 };
-    mirror->shininess = 30.0;
-    mirror->reflection_amount = 1.0;
-    mirror->transparent = false;
+    rt::Texture5x5* tex5x5 = new rt::Texture5x5();
+    std::shared_ptr<rt::TextureMaterial> checkerdTex = std::make_shared<rt::TextureMaterial>(tex5x5);
+    checkerdTex->ambient = 0.5;
+    checkerdTex->diffuse = 1.0;
+    checkerdTex->specular = 1.0;
+    checkerdTex->shininess = 1.0;
+    checkerdTex->reflection_amount = 0.0;
+    checkerdTex->transparent = false;
 
     rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
-    box1.setPosition({0.0, 0.0, 4.0});
-    box1.setScale({ 2.0, 2.0, 2.0 });
-    box1.setRotation(45.0, { 0.0, 1.0, 0.0 });
-    scene->objects.push_back(box1);
-
-    rt::Object box2 = rt::Object(rt::Mesh::getUnityCube(), bronze);
-    box2.setPosition({ 0.0, 0.0, -4.0 });
-    box2.setScale({ 2.0, 2.0, 2.0 });
-    box2.setRotation(-45.0, { 0.0, 1.0, 0.0 });
-    //scene->objects.push_back(box2);
+    box1.setPosition({ 0.0, -2.0, 0.0 });
+    box1.setScale({ 20.0, 1.0, 20.0 });
+    //box1.setRotation(45.0, { 0.0, 1.0, 0.0 });
+    //scene->objects.push_back(box1);
 
     rt::Object sphere1 = rt::Object(rt::Mesh::getUnitySphere(), bronze);
-    sphere1.setPosition({ 0.0, 0.0, -4.0 });
+    sphere1.setPosition({ 0.0, 2.0, -4.0 });
     sphere1.setScale({ 2.0, 2.0, 2.0 });
-    sphere1.setRotation(-20.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(sphere1);
+
+    rt::Object planeXZ = rt::Object(rt::Mesh::getXZPlane(), checkerdTex);
+    planeXZ.setPosition({ 0.0, -2.0, 0.0 });
+    planeXZ.setScale({ 10.0, 0.0, 10.0 });
+    scene->objects.push_back(planeXZ);
 
     rt::Object glass1 = rt::Object(rt::Mesh::getUnitySphere(), glass);
     glass1.setPosition({ 5.0, 2.0, 3.0 });
-    glass1.setScale({2.0, 2.0, 2.0});
+    glass1.setScale({ 2.0, 2.0, 2.0 });
     //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(glass1);
 
-    rt::Object glass2 = rt::Object(rt::Mesh::getUnityCube(), glass);
-    glass2.setPosition({ 4.0, 0.0, 4.0 });
-    glass2.setScale({ 0.2, 4.0, 4.0 });
-    //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
-    //scene->objects.push_back(glass2);
-
-    rt::Object mirror1 = rt::Object(rt::Mesh::getUnityCube(), mirror);
-    mirror1.setPosition({ -5.0, 0.0, 4.0 });
-    mirror1.setScale({ 0.1, 8.0, 8.0 });
-    mirror1.setRotation(15.0, { 0.0, 1.0, 0.0 });
-    //scene->objects.push_back(mirror1);
-
-    rt::Object sphere2 = rt::Object(rt::Mesh::getUnitySphere(), mirror);
-    sphere2.setPosition({ -8.0, -4.0, 0.0 });
-    sphere2.setScale({ 4.0, 4.0, 4.0 });
-    //scene->objects.push_back(sphere2);
+    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot1.obj"), bronze);
+    teapot.setPosition({ 5.5, 0.5, -4.0 });
+    teapot.setScale({ 0.12, 0.12, 0.12 });
+    teapot.setRotation(glm::radians(45.0), { 0.0, 1.0, 0.0 });
+    scene->objects.push_back(teapot);
 }
 
 int main(int argc, char** argv)
 {
     rt::RaytracerSimple tracer = rt::RaytracerSimple();
     tracer.scene = std::make_shared<rt::Scene>(rt::Scene());
+    tracer.numThreads = 4;
+    tracer.smoothing = true;
+    tracer.refraction = true;
+    tracer.reflection = true;
     setup(tracer.scene);
     tracer.scene->transform();
 

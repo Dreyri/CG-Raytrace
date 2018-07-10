@@ -21,37 +21,37 @@ fColor rt::SimpleMaterial::getSpecular(vec2 uv)
     return specular;
 }
 
-rt::TextureMaterial::TextureMaterial(Texture tex) : texture{tex}
+rt::TextureMaterial::TextureMaterial(Texture* tex) : texture{tex}
 {
 }
 
 int toIndex(floating coord, int max)
 {
-    return std::trunc(((coord > 0.999999) ? 0.999999 : coord) * max);
+    return static_cast<int>(std::trunc(((coord > 0.999999) ? 0.999999 : coord) * max));
 }
 
 fColor rt::TextureMaterial::getAmbient(vec2 uv)
 {
-    int u = toIndex(uv.x, texture.getWidth());
-    int v = toIndex(uv.y, texture.getHeight());
-    return texture.getColor(u, v) * ambient;
+    int u = toIndex(uv.x, texture->getWidth());
+    int v = toIndex(uv.y, texture->getHeight());
+    return texture->getColor(u, v) * ambient;
 }
 
 fColor rt::TextureMaterial::getDiffuse(vec2 uv)
 {
-    int u = toIndex(uv.x, texture.getWidth());
-    int v = toIndex(uv.y, texture.getHeight());
-    return texture.getColor(u, v) * diffuse;
+    int u = toIndex(uv.x, texture->getWidth());
+    int v = toIndex(uv.y, texture->getHeight());
+    return texture->getColor(u, v) * diffuse;
 }
 
 fColor rt::TextureMaterial::getSpecular(vec2 uv)
 {
-    int u = toIndex(uv.x, texture.getWidth());
-    int v = toIndex(uv.y, texture.getHeight());
-    return texture.getColor(u, v) * specular;
+    int u = toIndex(uv.x, texture->getWidth());
+    int v = toIndex(uv.y, texture->getHeight());
+    return texture->getColor(u, v) * specular;
 }
 
-rt::Texture::Texture()
+rt::Texture5x5::Texture5x5()
 {
     tex = { 
         { fColor(0.2), fColor(0.8), fColor(0.2), fColor(0.8), fColor(0.2), },
@@ -62,17 +62,17 @@ rt::Texture::Texture()
     };
 }
 
-int rt::Texture::getWidth()
+int rt::Texture5x5::getWidth()
 {
     return 5;
 }
 
-int rt::Texture::getHeight()
+int rt::Texture5x5::getHeight()
 {
     return 5;
 }
 
-fColor rt::Texture::getColor(int u, int v)
+fColor rt::Texture5x5::getColor(int u, int v)
 {
     return tex[getHeight() - 1 - u][v];
 }

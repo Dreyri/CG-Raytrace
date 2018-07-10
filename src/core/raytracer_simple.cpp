@@ -31,12 +31,12 @@ void rt::RaytracerSimple::render(std::shared_ptr<rt::RenderTarget> target)
 
     std::vector<std::thread> t = std::vector<std::thread>(numThreads);
     
-    for (int i = 0; i < numThreads; ++i)
+    for (unsigned int i = 0; i < numThreads; ++i)
     {
         t[i] = std::thread(&RaytracerSimple::renderMulti, this, i, numThreads);
     }
 
-    for (int i = 0; i < numThreads; ++i) {
+    for (unsigned int i = 0; i < numThreads; ++i) {
         t[i].join();
     }
 }

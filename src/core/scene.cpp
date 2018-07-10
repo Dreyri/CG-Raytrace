@@ -63,10 +63,24 @@ vec3 Scene::getBoundingCenter(Object& obj)
     case MeshType::unitySphere:
         return obj.position;
         break;
+    case MeshType::objFile:
+        vec3 accu = vec3(0.0);
+        int counter = 0;
+        for (unsigned int i = obj.poly_first; i <= obj.poly_last; i++)
+        {
+            accu += this->polygons[i].v1;
+            accu += this->polygons[i].v2;
+            accu += this->polygons[i].v3;
+            counter += 3;
+        }
+        return accu / (floating)counter;
+        break;
     }
+
+    return vec3();
 }
 
-floating Scene::getBoundingRadius(Object& obj)
+floating Scene::getBoundingRadius(Object& obj, vec3 center)
 {
     floating longest = 0.0;
 
@@ -76,19 +90,20 @@ floating Scene::getBoundingRadius(Object& obj)
         return 0.0;
         break;
     case MeshType::unityCube:
-        for(int i = obj.poly_first; i <= obj.poly_last; i++)
+    case MeshType::objFile:
+        for(unsigned int i = obj.poly_first; i <= obj.poly_last; i++)
         {
-            floating l = glm::length(this->polygons[i].v1);
+            floating l = glm::length(this->polygons[i].v1 - center);
             if (l > longest)
             {
                 longest = l;
             }
-            l = glm::length(this->polygons[i].v2);
+            l = glm::length(this->polygons[i].v2 - center);
             if (l > longest)
             {
                 longest = l;
             }
-            l = glm::length(this->polygons[i].v3);
+            l = glm::length(this->polygons[i].v3 - center);
             if (l > longest)
             {
                 longest = l;
@@ -100,9 +115,12 @@ floating Scene::getBoundingRadius(Object& obj)
         return glm::length(this->polygons[obj.poly_first].v1);
         break;
     }
+    return 0.0;
 }
 
 void Scene::setBoundingSphere(Object& obj)
 {
-    obj.bounding = Sphere(getBoundingCenter(obj), getBoundingRadius(obj));
+    vec3 center = getBoundingCenter(obj);
+    floating radius = getBoundingRadius(obj, center);
+    obj.bounding = Sphere(center, radius);
 }

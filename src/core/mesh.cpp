@@ -183,7 +183,7 @@ Mesh Mesh::getUnitySphere()
     };
 
     unsigned int recursionLevel = 2;
-    for (int i = 0; i < recursionLevel; i++)
+    for (unsigned int i = 0; i < recursionLevel; i++)
     {
         std::vector< glm::tvec3<uint32_t, glm::highp> > newIndexList = std::vector< glm::tvec3<uint32_t, glm::highp> >();
 

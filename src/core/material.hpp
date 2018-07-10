@@ -39,10 +39,18 @@ namespace rt
     class Texture
     {
     public:
-        Texture();
-        int getWidth();
-        int getHeight();
-        fColor getColor(int u, int v);
+        virtual int getWidth() = 0;
+        virtual int getHeight() = 0;
+        virtual fColor getColor(int u, int v) = 0;
+    };
+
+    class Texture5x5 : public Texture
+    {
+    public:
+        Texture5x5();
+        int getWidth() override;
+        int getHeight() override;
+        fColor getColor(int u, int v) override;
 
     private:
         std::vector<std::vector<fColor>> tex;
@@ -50,12 +58,12 @@ namespace rt
 
     struct TextureMaterial : public SimpleMaterial
     {
-        Texture texture;
+        Texture* texture;
         floating ambient;
         floating diffuse;
         floating specular;
 
-        TextureMaterial(Texture tex);
+        TextureMaterial(Texture* tex);
         fColor getAmbient(vec2 uv) override;
         fColor getDiffuse(vec2 uv) override;
         fColor getSpecular(vec2 uv) override;

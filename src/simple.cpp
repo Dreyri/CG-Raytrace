@@ -123,13 +123,23 @@ void SimpleScene2::setup()
     glass->refraction_amount = 0.7;
     glass->refraction_index = 1.5;
 
-    std::shared_ptr<rt::TextureMaterial> checkerdTex = std::make_shared<rt::TextureMaterial>(rt::Texture());
+    rt::Texture5x5* tex5x5 = new rt::Texture5x5();
+    std::shared_ptr<rt::TextureMaterial> checkerdTex = std::make_shared<rt::TextureMaterial>(tex5x5);
     checkerdTex->ambient = 0.5;
     checkerdTex->diffuse = 1.0;
     checkerdTex->specular = 1.0;
     checkerdTex->shininess = 1.0;
     checkerdTex->reflection_amount = 0.0;
     checkerdTex->transparent = false;
+
+    ImageTexture* mT = new ImageTexture(QImage("metal1.jpg"));
+    std::shared_ptr<rt::TextureMaterial> metalTex = std::make_shared<rt::TextureMaterial>(mT);
+    metalTex->ambient = 0.3;
+    metalTex->diffuse = 0.5;
+    metalTex->specular = 0.7;
+    metalTex->shininess = 15.0;
+    metalTex->reflection_amount = 0.4;
+    metalTex->transparent = false;
 
     rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
     box1.setPosition({ 0.0, -2.0, 0.0 });
@@ -142,7 +152,7 @@ void SimpleScene2::setup()
     sphere1.setScale({ 2.0, 2.0, 2.0 });
     scene->objects.push_back(sphere1);
 
-    rt::Object planeXZ = rt::Object(rt::Mesh::getXZPlane(), checkerdTex);
+    rt::Object planeXZ = rt::Object(rt::Mesh::getXZPlane(), metalTex);
     planeXZ.setPosition({ 0.0, -2.0, 0.0 });
     planeXZ.setScale({ 10.0, 0.0, 10.0 });
     scene->objects.push_back(planeXZ);
@@ -153,10 +163,10 @@ void SimpleScene2::setup()
     //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(glass1);
 
-    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot1.obj"), bronze);
+    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot1.obj"), checkerdTex);
     teapot.setPosition({ 5.5, 0.5, -4.0 });
     teapot.setScale({ 0.12, 0.12, 0.12 });
-    teapot.setRotation(glm::radians(45.0), {0.0, 1.0, 0.0});
+    teapot.setRotation(glm::radians(225.0), {0.0, 1.0, 0.0});
     scene->objects.push_back(teapot);
 
     this->timer.start();
@@ -191,4 +201,3 @@ void SimpleScene2::render(QImage& target)
     std::shared_ptr<ImageTarget> t = std::make_shared<ImageTarget>(target);
     tracer.render(t);
 }
-

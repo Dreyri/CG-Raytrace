@@ -10,7 +10,7 @@ namespace rt {
     class Scene {
     private:
         vec3 getBoundingCenter(Object& obj);
-        floating getBoundingRadius(Object& obj);
+        floating getBoundingRadius(Object& obj, vec3 center);
         void setBoundingSphere(Object& obj);
     public:
         Camera camera;
