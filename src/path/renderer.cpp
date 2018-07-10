@@ -1,109 +1,75 @@
 #include "renderer.hpp"
-#include "intersection.hpp"
-#include "material.hpp"
-#include "rendertarget.hpp"
-
-#include "../core/camera.hpp"
-#include "../core/scene.hpp"
-
-#include "ray.hpp"
 
 #include <iostream>
-#include <optional>
-#include <thread>
+#include <stdio.h>
+#include <vector>
+
+#include <QImage>
 
 namespace rt {
 namespace path {
 
-/*
-static rt::path::ray<float> monteCarloRay(const rt::camera& cam, float x,
-                                          float y, const rt::path::Rng& rng) {
-  // TODO use variance
-  float aspectRatio = cam.aspectRatio();
-  float px = (2.0f * ((x + 0.5f) / cam.width) - 1.0f) *
-             std::tan(cam.fov / 2 * pi() / 180.0f) * aspectRatio;
-  float py = (1.0f - 2.0f * ((y + 0.5f) / cam.height)) *
-             std::tan(cam.fov / 2 * pi() / 180.0f);
-
-  glm::vec3 dir(px, py, -1.0f);
-
-  return rt::path::ray<float>(cam.position, glm::normalize(dir));
+// Clamp double to min/max of 0/1
+inline double clamp(double x) {
+  return x < 0 ? 0 : x > 1 ? 1 : x;
 }
-*/
-
-Renderer::Renderer(uint32_t samples, uint32_t depth)
-    : m_samples{samples}
-    , m_depth{depth} {
-  m_rng.seed(4); // chosen by random diceroll, guaranteed to be random
+// Clamp to between 0-255
+inline int toInt(double x) {
+  return int(clamp(x) * 255 + .5);
 }
 
-rt::path::Image* Renderer::render(rt::path::scene* scene) {
-  size_t width = scene->camera().width();
-  size_t height = scene->camera().height();
+Renderer::Renderer(Scene* scene, Camera* camera) {
+  m_scene = scene;
+  m_camera = camera;
+  m_pixel_buffer =
+      new glm::dvec3[m_camera->get_width() * m_camera->get_height()];
+}
 
-  rt::path::Image* target = new rt::path::Image(nullptr, width, height);
+void Renderer::render(int samples) {
+  int width = m_camera->get_width();
+  int height = m_camera->get_height();
+  double samples_recp = 1. / samples;
 
-  float sample_strength = 1.0f / static_cast<float>(m_samples);
+// Main Loop
+#pragma omp parallel for schedule(dynamic, 1) // OpenMP
+  for (int y = 0; y < height; y++) {
+    unsigned short Xi[3] = {0, 0, y * y * y}; // Stores seed for erand48
 
-#pragma omp parallel for
-  for (size_t y = 0; y < height; ++y) {
-    for (size_t x = 0; x < width; ++x) {
-      glm::vec4 col{};
+    fprintf(stderr, "\rRendering (%i samples): %.2f%% ", // Prints
+            samples, (double)y / height * 100);          // progress
 
-      for (uint32_t sample = 0; sample < m_samples; ++sample) {
-        rt::path::ray<float> r = scene->camera().getRay(x, y, m_rng);
-        col += scene->trace_ray(r, 0, m_rng);
+    for (int x = 0; x < width; x++) {
+      glm::dvec3 col = glm::dvec3();
+
+      for (int a = 0; a < samples; a++) {
+        Ray ray = m_camera->get_ray(x, y, a > 0, Xi);
+        col = col + m_scene->trace_ray(ray, 0, Xi);
       }
 
-      col *= sample_strength;
-      glm::tvec4<uint8_t> final_color;
-      final_color.r = col.r * 255.0f;
-      final_color.g = col.g * 255.0f;
-      final_color.b = col.b * 255.0f;
-      final_color.a = col.a * 255.0f;
-      target->setColor(x, y, final_color);
+      m_pixel_buffer[(y)*width + x] = col * samples_recp;
     }
-
-    printf("%zu out of %zu lines calculated\n", y, height);
   }
-  return target;
 }
 
-glm::vec4 Renderer::traceRay(rt::path::scene* scene,
-                             const rt::path::ray<float>& r, uint32_t depth) {
-  std::optional<Intersection> intersect = scene->calculateIntersection(r);
+void Renderer::save_image(const char* file_path) {
+  int width = m_camera->get_width();
+  int height = m_camera->get_height();
 
-  if (!intersect) {
-    return scene->background();
+  std::vector<unsigned char> pixel_buffer;
+
+  int pixel_count = width * height;
+
+  for (int i = 0; i < pixel_count; i++) {
+    pixel_buffer.push_back(toInt(m_pixel_buffer[i].x));
+    pixel_buffer.push_back(toInt(m_pixel_buffer[i].y));
+    pixel_buffer.push_back(toInt(m_pixel_buffer[i].z));
+    pixel_buffer.push_back(255);
   }
 
-  if (intersect->material.type() == EMIT) {
-    return intersect->material.emission();
-  }
+  QImage img(std::data(pixel_buffer), width, height, QImage::Format_RGBA8888);
+  img.save(file_path);
 
-  glm::vec4 color = intersect->material.color();
-
-  // max of all the color elements
-  float p = color.r > color.g && color.r > color.b
-                ? color.r
-                : color.g > color.b ? color.g : color.b;
-
-  float rnd = m_rng();
-
-  // russian roulette termination after the minimum depth
-  if (++depth > m_depth) {
-    if (rnd < (p * 0.9f)) {
-      color *= (0.9f / p);
-    } else {
-      return intersect->material.emission();
-    }
-  }
-
-  glm::vec3 newray_orig = r.origin + (r.direction * intersect->distance);
-  rt::path::ray<float> reflected = intersect->material.calculateReflectedRay(
-      r, newray_orig, intersect->normal, m_rng);
-
-  return color + traceRay(scene, reflected, depth);
+  pixel_buffer.clear();
 }
 } // namespace path
 } // namespace rt

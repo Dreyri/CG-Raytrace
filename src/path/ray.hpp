@@ -4,16 +4,13 @@
 
 namespace rt {
 namespace path {
-template<typename T>
-struct ray {
-  using value_type = glm::tvec3<T>;
 
-  value_type origin;
-  value_type direction;
-
-  constexpr ray(const value_type& origin, const value_type& direction)
-      : origin{origin}
-      , direction{direction} {
+struct Ray {
+  glm::dvec3 origin, direction, direction_inv;
+  Ray(glm::dvec3 o_, glm::dvec3 d_)
+      : origin(o_)
+      , direction(d_) {
+    direction_inv = glm::dvec3(1. / direction.x, 1. / direction.y, 1. / direction.z);
   }
 };
 } // namespace path

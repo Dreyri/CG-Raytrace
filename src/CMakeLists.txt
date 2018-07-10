@@ -18,6 +18,7 @@ add_library(rtpath
   path/objects.cpp
   path/scene.cpp
   path/kdtree.cpp
+  path/texture.cpp
   path/material.cpp
   path/camera.cpp
   ../third_party/tiny_obj_loader.cpp

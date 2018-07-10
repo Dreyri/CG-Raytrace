@@ -1,123 +1,103 @@
 #pragma once
 
-#include <tuple>
+#include <algorithm>
+#include <cfloat>
 
-#include <glm/glm.hpp>
-
-#include "aabb.hpp"
+#include "aabbox.hpp"
 #include "material.hpp"
 
 namespace rt {
 namespace path {
-struct triangle {
-  glm::vec3 v0, v1, v2;
-  glm::vec3 e1, e2;
-  glm::vec3 n;
-  glm::vec2 t0, t1, t2;
 
-  rt::path::Material* material;
+struct Triangle {
+  glm::dvec3 v0, v1, v2;    // Vertex world space coordinates
+  glm::dvec3 e1, e2;        // Edge 1 and edge 2 of triangle
+  glm::dvec3 n, t0, t1, t2; // Triangle normal and texture coordinates
+  Material* m;              // Pointer to material
 
-  triangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
-           const glm::vec2& t0, const glm::vec2& t1, const glm::vec2& t2,
-           rt::path::Material* mat)
-      : v0{v0}
-      , v1{v1}
-      , v2{v2}
-      , e1{v1 - v0}
-      , e2{v2 - v0}
-      , n{glm::normalize(glm::cross(e1, e2))}
-      , t0{t0}
-      , t1{t1}
-      , t2{t2}
-      , material{mat} {
+  Triangle(glm::dvec3 v0_, glm::dvec3 v1_, glm::dvec3 v2_,
+           glm::dvec3 t0_ = glm::dvec3(), glm::dvec3 t1_ = glm::dvec3(),
+           glm::dvec3 t2_ = glm::dvec3(), Material* m_ = NULL) {
+    v0 = v0_, v1 = v1_, v2 = v2_, e1 = v1 - v0, e2 = v2 - v0,
+    n = glm::cross(e1, e2);
+    t0 = t0_, t1 = t1_, t2 = t2_;
+    m = m_;
   }
 
-  rt::path::AABB bounding_box() const {
-    glm::vec3 min{std::min(std::min(v0.x, v1.x), v2.x),
-                  std::min(std::min(v0.y, v1.y), v2.y),
-                  std::min(std::min(v0.z, v1.z), v2.z)};
+  // Returns axis aligned bounding box that contains the triangle
+  AABBox get_bounding_box() {
+    glm::dvec3 bl = glm::dvec3(std::min(std::min(v0.x, v1.x), v2.x),
+                               std::min(std::min(v0.y, v1.y), v2.y),
+                               std::min(std::min(v0.z, v1.z), v2.z));
+    glm::dvec3 tr = glm::dvec3(std::max(std::max(v0.x, v1.x), v2.x),
+                               std::max(std::max(v0.y, v1.y), v2.y),
+                               std::max(std::max(v0.z, v1.z), v2.z));
 
-    glm::vec3 max{std::max(std::max(v0.x, v1.x), v2.x),
-                  std::max(std::max(v0.y, v1.y), v2.y),
-                  std::max(std::max(v0.z, v1.z), v2.z)};
-
-    return rt::path::AABB(min, max);
+    return AABBox(bl, tr);
   }
 
-  glm::vec3 middle() const {
-    return (v0 + v1 + v2) / 3.0f;
+  // Returns the midpoint of the triangle
+  glm::dvec3 get_midpoint() {
+    return (v0 + v1 + v2) / 3.0;
   }
 
-  std::optional<std::tuple<float, glm::vec3>> intersect(const rt::path::ray<float>& r,
-                                                       float tmin) const {
-    glm::vec3 pvec = glm::cross(r.direction, e2);
-    float det = glm::dot(e1, pvec);
+  // Checks if ray intersects with triangle. Returns true/false.
+  bool intersect(Ray ray, double& t, double tmin, glm::dvec3& norm) const {
 
-    if (det == 0.0f) {
-      return {};
-    }
+    double u, v, t_temp = 0;
 
-    float inv_det = 1.0f / det;
-    auto tvec = r.origin - v0;
-
-    float u = glm::dot(tvec, pvec) * inv_det;
-
-    if (u < 0.0f || u > 1.0f) {
-      return {};
-    }
-
-    glm::vec3 qvec = glm::cross(tvec, e1);
-
-    float v = glm::dot(r.direction, qvec) * inv_det;
-
-    if (v < 0.0f || u + v > 1.0f) {
-      return {};
-    }
-
-    float t_tmp = glm::dot(e2, qvec) * inv_det;
-
-    if (t_tmp < tmin) {
-      if (t_tmp > 0.0001f) {
-        return std::make_tuple(t_tmp, n);
+    glm::dvec3 pvec = glm::cross(ray.direction, e2);
+    double det = glm::dot(e1, pvec);
+    if (det == 0)
+      return false;
+    double invDet = 1. / det;
+    glm::dvec3 tvec = ray.origin - v0;
+    u = glm::dot(tvec, pvec) * invDet;
+    if (u < 0 || u > 1)
+      return false;
+    glm::dvec3 qvec = glm::cross(tvec, e1);
+    v = glm::dot(ray.direction, qvec) * invDet;
+    if (v < 0 || u + v > 1)
+      return false;
+    t_temp =
+        glm::dot(e2, qvec) * invDet; // Set distance along ray to intersection
+    if (t_temp < tmin) {
+      if (t_temp > 1e-9) { // Fairly arbritarily small value, scared to change
+        t = t_temp;        // it as it works.
+        norm = n;
+        return true;
       }
     }
-
-    return {};
+    return false;
   }
 
-  /**
-   * coordinates of point p on the triangle
-   */
-  glm::vec3 barycentric(const glm::vec3& p) const {
-    glm::vec3 v2_ = p - v0;
-
-    float f00 = glm::dot(e1, e1);
-    float f01 = glm::dot(e1, e2);
-    float f11 = glm::dot(e2, e2);
-    float f20 = glm::dot(v2_, e1);
-    float f21 = glm::dot(v2_, e2);
-
-    float f = f00 * f11 - f01 * f01;
-    float v = (f11 * f20 - f01 * f21) / f;
-    float w = (f00 * f21 - f01 * f20) / f;
-    float u = 1 - v - w;
-
-    return glm::vec3(u, v, w);
+  // Returns barycentric coordinates of point p on the triangle
+  glm::dvec3 barycentric(glm::dvec3 p) {
+    glm::dvec3 v2_ = p - v0;
+    double d00 = glm::dot(e1, e1);
+    double d01 = glm::dot(e1, e2);
+    double d11 = glm::dot(e2, e2);
+    double d20 = glm::dot(v2_, e1);
+    double d21 = glm::dot(v2_, e2);
+    double d = d00 * d11 - d01 * d01;
+    double v = (d11 * d20 - d01 * d21) / d;
+    double w = (d00 * d21 - d01 * d20) / d;
+    double u = 1 - v - w;
+    return glm::dvec3(u, v, w);
   }
 
-  glm::vec4 color_at(const glm::vec3& p) const {
-    if (!material) {
-      return glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    }
+  // Returns the colour at point p on the triangle
+  glm::dvec3 get_colour_at(glm::dvec3 p) {
+    if (m == NULL)
+      return glm::dvec3(1, 0, 1);
 
-    glm::vec3 b = barycentric(p);
-    glm::vec3 c{};
+    glm::dvec3 b = barycentric(p);
+    glm::dvec3 c = glm::dvec3();
+    c = c + (t0 * b.x);
+    c = c + (t1 * b.y);
+    c = c + (t2 * b.z);
 
-    c += (glm::vec3(t0, 0.0f) * b.x);
-    c += (glm::vec3(t1, 0.0f) * b.y);
-    c += (glm::vec3(t2, 0.0f) * b.z);
-
-    return material->color_at(c.x, c.y);
+    return m->get_colour_at(c.x, c.y);
   }
 };
 } // namespace path

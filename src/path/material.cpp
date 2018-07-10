@@ -1,60 +1,66 @@
 #include "material.hpp"
 
-#include "renderer.hpp"
+#include <stdexcept>
+#include <stdlib.h>
+
+#include "ray.hpp"
 
 namespace rt {
 namespace path {
 
-Material::Material(MaterialType type, const glm::vec3& color,
-                   const glm::vec3& emission,
-                   const std::shared_ptr<rt::path::Image>& img)
-    : m_type{type}
-    , m_color{glm::vec4(color, 1.0f)}
-    , m_emission{glm::vec4(emission, 1.0f)}
-    , m_image{img} {
+Material::Material(MaterialType t, glm::dvec3 c, glm::dvec3 e, Texture tex) {
+  m_type = t, m_colour = c, m_emission = e;
+  m_texture = tex;
 }
 
-glm::vec4 Material::color_at(float u, float v) const {
-  if (m_image) {
-    return m_image->at_rel(u, v);
+MaterialType Material::get_type() const {
+  return m_type;
+}
+glm::dvec3 Material::get_colour() const {
+  return m_colour;
+}
+
+// Get colour at UV coordinates u,v
+glm::dvec3 Material::get_colour_at(double u, double v) const {
+  if (m_texture.is_loaded())
+    return m_texture.get_pixel(u, v);
+
+  return m_colour;
+}
+glm::dvec3 Material::get_emission() const {
+  return m_emission;
+}
+
+Ray Material::get_reflected_ray(const Ray& r, glm::dvec3& p,
+                                const glm::dvec3& n, unsigned short* Xi) const {
+  // Ideal specular reflection
+  if (m_type == SPEC) {
+    double roughness = 0.8;
+    glm::dvec3 reflected = r.direction - n * 2.0 * glm::dot(n, r.direction);
+    reflected = glm::normalize(
+        glm::dvec3(reflected.x + (erand48(Xi) - 0.5) * roughness,
+                   reflected.y + (erand48(Xi) - 0.5) * roughness,
+                   reflected.z + (erand48(Xi) - 0.5) * roughness));
+
+    return Ray(p, reflected);
   }
-  return m_color;
-}
+  // Ideal diffuse reflection
+  if (m_type == DIFF) {
+    glm::dvec3 nl = glm::dot(n, r.direction) < 0 ? n : n * -1.0;
+    double r1 = 2 * M_PI * erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+    glm::dvec3 w = nl,
+               u = glm::normalize(
+                   (fabs(w.x) > .1 ? glm::dvec3(0.0, 1.0, 0.0)
+                                   : glm::cross(glm::dvec3(1.0, 0.0, 0.0), w))),
+               v = glm::cross(w, u);
+    glm::dvec3 d = glm::normalize(u * cos(r1) * r2s + v * sin(r1) * r2s +
+                                  w * sqrt(1 - r2));
 
-rt::path::ray<float> Material::calculateReflectedRay(
-    const rt::path::ray<float>& r, const glm::vec3& origin,
-    const glm::vec3& normal, const rt::path::Rng& rng) {
-  if (m_type == SPECULAR) {
-    float roughness = 0.8f;
-    glm::vec3 reflected =
-        r.direction - normal * 2.0f * glm::dot(normal, r.direction);
-
-    reflected =
-        glm::normalize(glm::vec3(reflected.x + (rng() - 0.5f) * roughness,
-                                 reflected.y + (rng() - 0.5f) * roughness,
-                                 reflected.z + (rng() - 0.5f) * roughness));
-
-    return rt::path::ray<float>(origin, reflected);
-  } else if (m_type == DIFFUSE) {
-    glm::vec3 nl =
-        glm::dot(normal, r.direction) < 0.0f ? normal : normal * -1.0f;
-    float r1 = 2 * pi() * rng();
-    float r2 = rng();
-    float r2s = std::sqrt(r2);
-
-    glm::vec3 w = nl;
-    glm::vec3 u = ((std::abs(w.x) > 0.1f ? glm::vec3(0.0f, 1.0f, 0.0f)
-                                         : glm::vec3(1.0f, 0.0f, 0.0f)));
-    glm::vec3 v = glm::cross(w, u);
-
-    glm::vec3 d =
-        glm::normalize(u * std::cos(r1) * r2s + v * std::sin(r1) * r2s +
-                       w * std::sqrt(1.0f - r2));
-
-    return rt::path::ray<float>(origin, d);
+    return Ray(p, d);
   }
 
-  throw std::logic_error("shouldn't be able to reach this");
+  throw std::logic_error("Can't get here");
 }
+
 } // namespace path
 } // namespace rt

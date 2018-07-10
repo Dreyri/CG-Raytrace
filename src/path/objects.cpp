@@ -1,170 +1,184 @@
 #include "objects.hpp"
 
 #include <iostream>
+#include <math.h>
+#include <stdio.h>
 
-#include "triangle.hpp"
+#include "material.hpp"
+#include "ray.hpp"
 
 namespace rt {
 namespace path {
-sphere::sphere(const glm::vec3& pos, float radius, rt::path::Material mat)
-    : object(pos)
-    , m_radius{radius}
-    , m_material{mat} {
+
+ObjectIntersection::ObjectIntersection(bool hit_, double u_, glm::dvec3 n_,
+                                       Material m_) {
+  hit = hit_, u = u_, n = n_, m = m_;
 }
 
-std::optional<Intersection>
-sphere::calculate_intersection(const rt::path::ray<float>& r) {
-  float dist = 0.0f;
-
-  glm::vec3 n{};
-
-  glm::vec3 op = m_position - r.origin;
-  float t;
-  static constexpr float eps = 0.0001f;
-
-  float b = glm::dot(op, r.direction);
-  float det = b * b - glm::dot(op, op) + m_radius * m_radius;
-
-  if (det < 0.0f) {
-    return {};
-  } else {
-    det = std::sqrt(det);
-  }
-
-  dist = (t = b - det) > eps ? t : ((t = b + det) > eps ? t : 0.0f);
-  if (dist != 0.0f) {
-    n = glm::normalize((r.origin + r.direction * dist) - m_position);
-    return rt::path::Intersection(dist, n, m_material);
-  }
-
-  return {};
+Sphere::Sphere(glm::dvec3 p_, double r_, Material m_) {
+  m_p = p_, m_r = r_, m_m = m_;
 }
 
-mesh::mesh(const glm::vec3& position, const std::string& file_path,
-           rt::path::Material mat)
-    : object(position)
-    , m_tshapes{}
-    , m_tmaterials{}
-    , m_materials{}
-    , m_triangles{}
-    , m_material{mat} {
-  std::cout << "Loading '" << file_path << "'\n";
+double Sphere::get_radius() {
+  return m_r;
+}
+Material Sphere::get_material() {
+  return m_m;
+}
 
-  size_t pos = file_path.find_last_of("/");
-  std::string base_path = file_path.substr(0, pos + 1);
+// Check if ray intersects with sphere. Returns ObjectIntersection data
+// structure
+ObjectIntersection Sphere::get_intersection(const Ray& ray) {
+  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
+  bool hit = false;
+  double distance = 0;
+  glm::dvec3 n = glm::dvec3();
 
-  std::string err = tinyobj::LoadObj(m_tshapes, m_tmaterials, file_path.c_str(),
-                                     base_path.c_str());
+  glm::dvec3 op = m_p - ray.origin;
+  double t, eps = 1e-4, b = glm::dot(op, ray.direction),
+            det = b * b - glm::dot(op, op) + m_r * m_r;
+  if (det < 0)
+    return ObjectIntersection(hit, distance, n, m_m);
+  else
+    det = sqrt(det);
+  distance = (t = b - det) > eps ? t : ((t = b + det) > eps ? t : 0);
+  if (distance != 0)
+    hit = true, n = glm::normalize((ray.origin + ray.direction * distance) - m_p);
+
+  return ObjectIntersection(hit, distance, n, m_m);
+}
+
+Mesh::Mesh(glm::dvec3 p_, const char* file_path, Material m_) {
+
+  m_p = p_, m_m = m_;
+
+  std::string mtlbasepath;
+  std::string inputfile = file_path;
+  unsigned long pos = inputfile.find_last_of("/");
+  mtlbasepath = inputfile.substr(0, pos + 1);
+
+  printf("Loading %s...\n", file_path);
+  // Attempt to load mesh
+  std::string err = tinyobj::LoadObj(m_shapes, m_materials, inputfile.c_str(),
+                                     mtlbasepath.c_str());
 
   if (!err.empty()) {
-    std::cerr << err << "\n";
+    std::cerr << err << std::endl;
     exit(1);
   }
+  printf(" - Generating k-d tree...\n\n");
 
-  std::cout << "Generating KD Tree\n";
+  long shapes_size, indices_size, materials_size;
+  shapes_size = m_shapes.size();
+  materials_size = m_materials.size();
 
-  for (const auto& mat : m_tmaterials) {
-    std::string texture_path("");
+  // Load materials/textures from obj
+  // TODO: Only texture is loaded at the moment, need to implement material
+  // types and colours
+  for (int i = 0; i < materials_size; i++) {
+    std::string texture_path = "";
 
-    if (!mat.diffuse_texname.empty()) {
-      if (mat.diffuse_texname[0] == '/') {
-        texture_path = mat.diffuse_texname;
-      }
-      texture_path = base_path + mat.diffuse_texname;
-      QImage img{};
-      auto qtexpath = QString::fromStdString(texture_path);
-      img.load(qtexpath);
-      auto path_img = std::make_shared<rt::path::Image>(img);
-      m_materials.push_back(Material(DIFFUSE, glm::vec3(1.0f, 1.0f, 1.0f),
-                                     glm::vec3(), path_img));
-    }
-
-    else {
-      m_materials.push_back(
-          Material(DIFFUSE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3()));
+    if (!m_materials[i].diffuse_texname.empty()) {
+      if (m_materials[i].diffuse_texname[0] == '/')
+        texture_path = m_materials[i].diffuse_texname;
+      texture_path = mtlbasepath + m_materials[i].diffuse_texname;
+      materials.push_back(Material(DIFF, glm::dvec3(1, 1, 1), glm::dvec3(),
+                                   Texture(texture_path.c_str())));
+    } else {
+      materials.push_back(Material(DIFF, glm::dvec3(1, 1, 1), glm::dvec3()));
     }
   }
 
-  // load triangles
+  // Load triangles from obj
+  for (int i = 0; i < shapes_size; i++) {
+    indices_size = m_shapes[i].mesh.indices.size() / 3;
+    for (size_t f = 0; f < indices_size; f++) {
 
-  for (size_t i = 0; i < std::size(m_tshapes); ++i) {
-    for (size_t j = 0; j < (std::size(m_tshapes[i].mesh.indices) / 3); ++j) {
-      glm::vec3 v0{
-          m_tshapes[i].mesh.positions[m_tshapes[i].mesh.indices[3 * j] * 3],
-          m_tshapes[i].mesh.positions[m_tshapes[i].mesh.indices[3 * j] * 3 + 1],
-          m_tshapes[i]
-              .mesh.positions[m_tshapes[i].mesh.indices[3 * j] * 3 + 2]};
+      // Triangle vertex coordinates
+      glm::dvec3 v0_ =
+          glm::dvec3(
+              m_shapes[i].mesh.positions[m_shapes[i].mesh.indices[3 * f] * 3],
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f] * 3 + 1],
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f] * 3 + 2]) +
+          m_p;
 
-      glm::vec3 v1{
-          m_tshapes[i].mesh.positions[m_tshapes[i].mesh.indices[3 * j + 1] * 3],
-          m_tshapes[i]
-              .mesh.positions[m_tshapes[i].mesh.indices[3 * j + 1] * 3 + 1],
-          m_tshapes[i]
-              .mesh.positions[m_tshapes[i].mesh.indices[3 * j + 1] * 3 + 2]};
-      glm::vec3 v2{
-          m_tshapes[i].mesh.positions[m_tshapes[i].mesh.indices[3 * j + 2] * 3],
-          m_tshapes[i]
-              .mesh.positions[m_tshapes[i].mesh.indices[3 * j + 2] * 3 + 1],
-          m_tshapes[i]
-              .mesh.positions[m_tshapes[i].mesh.indices[3 * j + 2] * 3 + 2]};
+      glm::dvec3 v1_ =
+          glm::dvec3(
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f + 1] * 3],
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f + 1] * 3 + 1],
+              m_shapes[i]
+                  .mesh
+                  .positions[m_shapes[i].mesh.indices[3 * f + 1] * 3 + 2]) +
+          m_p;
 
-      glm::vec2 t0{};
-      glm::vec2 t1{};
-      glm::vec2 t2{};
+      glm::dvec3 v2_ =
+          glm::dvec3(
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f + 2] * 3],
+              m_shapes[i]
+                  .mesh.positions[m_shapes[i].mesh.indices[3 * f + 2] * 3 + 1],
+              m_shapes[i]
+                  .mesh
+                  .positions[m_shapes[i].mesh.indices[3 * f + 2] * 3 + 2]) +
+          m_p;
 
-      if (m_tshapes[i].mesh.indices[3 * j + 2] * 2 + 1 <
-          std::size(m_tshapes[i].mesh.texcoords)) {
-        t0 = glm::vec2(
-            m_tshapes[i].mesh.texcoords[m_tshapes[i].mesh.indices[3 * j] * 2],
-            m_tshapes[i]
-                .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j] * 2 + 1]);
-        t1 = glm::vec2(
-            m_tshapes[i]
-                .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 1] * 2],
-            m_tshapes[i]
-                .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 1] * 2 + 1]);
-        t2 = glm::vec2(
-            m_tshapes[i]
-                .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 2] * 2],
-            m_tshapes[i]
-                .mesh.texcoords[m_tshapes[i].mesh.indices[3 * j + 2] * 2 + 1]);
-      }
+      glm::dvec3 t0_, t1_, t2_;
 
-      if (m_tshapes[i].mesh.material_ids[j] >= 0 &&
-          m_tshapes[i].mesh.material_ids[j] <
-              static_cast<int>(std::size(m_materials))) {
-        m_triangles.push_back(
-            new triangle(v0, v1, v2, t0, t1, t2,
-                         &m_materials[m_tshapes[i].mesh.material_ids[j]]));
+      // Attempt to load triangle texture coordinates
+      if (m_shapes[i].mesh.indices[3 * f + 2] * 2 + 1 <
+          m_shapes[i].mesh.texcoords.size()) {
+        t0_ = glm::dvec3(
+            m_shapes[i].mesh.texcoords[m_shapes[i].mesh.indices[3 * f] * 2],
+            m_shapes[i].mesh.texcoords[m_shapes[i].mesh.indices[3 * f] * 2 + 1],
+            0);
+
+        t1_ = glm::dvec3(
+            m_shapes[i].mesh.texcoords[m_shapes[i].mesh.indices[3 * f + 1] * 2],
+            m_shapes[i]
+                .mesh.texcoords[m_shapes[i].mesh.indices[3 * f + 1] * 2 + 1],
+            0);
+
+        t2_ = glm::dvec3(
+            m_shapes[i].mesh.texcoords[m_shapes[i].mesh.indices[3 * f + 2] * 2],
+            m_shapes[i]
+                .mesh.texcoords[m_shapes[i].mesh.indices[3 * f + 2] * 2 + 1],
+            0);
       } else {
-        m_triangles.push_back(
-            new triangle(v0, v1, v2, t0, t1, t2, &m_material));
+        t0_ = glm::dvec3();
+        t1_ = glm::dvec3();
+        t2_ = glm::dvec3();
       }
+
+      if (m_shapes[i].mesh.material_ids[f] < materials.size())
+        tris.push_back(
+            new Triangle(v0_, v1_, v2_, t0_, t1_, t2_,
+                         &materials[m_shapes[i].mesh.material_ids[f]]));
+      else
+        tris.push_back(new Triangle(v0_, v1_, v2_, t0_, t1_, t2_, &m_m));
     }
   }
 
-  m_tshapes.clear();
-  m_tshapes.shrink_to_fit();
-  m_tmaterials.clear();
-  m_tmaterials.shrink_to_fit();
-
-  m_node = KDNode::build(m_triangles, 0);
+  // Clean up
+  m_shapes.clear();
+  m_materials.clear();
+  node = KDNode().build(tris, 0);
+  printf("\n");
+  // bvh = BVH(&tris);
 }
 
-std::optional<Intersection>
-mesh::calculate_intersection(const rt::path::ray<float>& r) {
-  float tmin = std::numeric_limits<float>::max();
-
-  auto intersect = m_node->hit(r, tmin);
-
-  if (intersect) {
-    float dist = std::get<float>(*intersect);
-    glm::vec4 col = std::get<glm::vec4>(*intersect);
-    glm::vec3 normal = std::get<glm::vec3>(*intersect);
-    return Intersection(dist, normal, Material(DIFFUSE, col));
-  }
-
-  return {};
+// Check if ray intersects with mesh. Returns ObjectIntersection data structure
+ObjectIntersection Mesh::get_intersection(const Ray& ray) {
+  double t = 0, tmin = INFINITY;
+  glm::dvec3 normal = glm::dvec3();
+  glm::dvec3 colour = glm::dvec3();
+  bool hit = node->hit(node, ray, t, tmin, normal, colour);
+  // bool hit = bvh.getIntersection(ray, t, tmin, normal);
+  return ObjectIntersection(hit, tmin, normal,
+                            Material(DIFF, colour, glm::dvec3()));
 }
 } // namespace path
 } // namespace rt

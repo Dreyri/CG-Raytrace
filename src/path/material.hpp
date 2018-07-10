@@ -1,57 +1,34 @@
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include <glm/glm.hpp>
-
 #include "ray.hpp"
-#include "rendertarget.hpp"
+#include "texture.hpp"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 namespace rt {
 namespace path {
-class Rng;
-enum MaterialType {
-  DIFFUSE,
-  SPECULAR,
-  EMIT,
-};
+
+enum MaterialType { DIFF, SPEC, EMIT };
+
 class Material {
+
 private:
-  MaterialType m_type{DIFFUSE};
-  glm::vec4 m_color{1.0f, 1.0f, 1.0f, 1.0f};
-  glm::vec4 m_emission{0.0f, 0.0f, 0.0f, 1.0f};
-  std::shared_ptr<rt::path::Image> m_image{nullptr};
-  // todo texture
+  MaterialType m_type;
+  glm::dvec3 m_colour;
+  glm::dvec3 m_emission;
+  Texture m_texture;
+
 public:
-  Material() = default;
-  Material(MaterialType type,
-           const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f),
-           const glm::vec3& emission = glm::vec3{0.0f, 0.0f, 0.0f},
-           const std::shared_ptr<rt::path::Image>& img =
-               std::shared_ptr<rt::path::Image>());
-
-  Material(const Material&) = default;
-  Material& operator=(const Material&) = default;
-
-  inline MaterialType type() const {
-    return m_type;
-  }
-
-  inline const glm::vec4& color() const {
-    return m_color;
-  }
-
-  inline const glm::vec4& emission() const {
-    return m_emission;
-  }
-
-  glm::vec4 color_at(float u, float v) const;
-
-  rt::path::ray<float> calculateReflectedRay(const rt::path::ray<float>& r,
-                                             const glm::vec3& origin,
-                                             const glm::vec3& normal,
-                                             const Rng& rng);
+  Material(MaterialType t = DIFF, glm::dvec3 c = glm::dvec3(1, 1, 1),
+           glm::dvec3 e = glm::dvec3(0, 0, 0), Texture tex = Texture());
+  MaterialType get_type() const;
+  glm::dvec3 get_colour() const;
+  glm::dvec3 get_colour_at(double u, double v) const;
+  glm::dvec3 get_emission() const;
+  Ray get_reflected_ray(const Ray& r, glm::dvec3& p, const glm::dvec3& n,
+                        unsigned short* Xi) const;
 };
 } // namespace path
 } // namespace rt

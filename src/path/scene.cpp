@@ -1,57 +1,72 @@
 #include "scene.hpp"
-
-#include "renderer.hpp"
+#include "objects.hpp"
 
 namespace rt {
 namespace path {
-glm::vec4 scene::trace_ray(const rt::path::ray<float>& r, uint32_t depth,
-                           const rt::path::Rng& rng) {
-  auto intersect = calculateIntersection(r);
 
-  if (!intersect) {
-    return m_bg_color;
-  }
-
-  if (intersect->material.type() == EMIT) {
-    return intersect->material.emission();
-  }
-
-  glm::vec4 color = intersect->material.color();
-
-  float p = std::max(std::max(color.x, color.y), color.z);
-
-  float rnd = rng();
-  if (++depth > 5) {
-    if (rnd < p * 0.9f) {
-      color = color * (0.9f / p);
-    } else {
-      return intersect->material.emission();
-    }
-  }
-
-  glm::vec3 x = r.origin + r.direction * intersect->distance;
-  rt::path::ray<float> reflect =
-      intersect->material.calculateReflectedRay(r, x, intersect->normal, rng);
-
-  return color * trace_ray(reflect, depth, rng);
+void Scene::add(Object* object) {
+  m_objects.push_back(object);
 }
 
-std::optional<Intersection>
-scene::calculateIntersection(const rt::path::ray<float>& r) const {
+ObjectIntersection Scene::intersect(const Ray& ray) {
+  ObjectIntersection isct = ObjectIntersection();
+  ObjectIntersection temp;
+  long size = m_objects.size();
 
-  std::optional<Intersection> res = {};
-  std::optional<Intersection> tmp = {};
+  for (int i = 0; i < size; i++) {
+    temp = m_objects.at((unsigned)i)->get_intersection(ray);
 
-  for (size_t i = 0; i < std::size(m_objects); ++i) {
-    tmp = m_objects[i]->calculate_intersection(r);
-
-    if (tmp) {
-      if (!res || tmp->distance < res->distance) {
-        res = tmp;
-      }
+    if (temp.hit) {
+      if (isct.u == 0 || temp.u < isct.u)
+        isct = temp;
     }
   }
-  return res;
+  return isct;
+}
+
+glm::dvec3 Scene::trace_ray(const Ray& ray, int depth, unsigned short* Xi) {
+
+  ObjectIntersection isct = intersect(ray);
+
+  // If no hit, return world colour
+  if (!isct.hit)
+    return glm::dvec3();
+  /*if (!isct.hit){
+      double u, v;
+      v = (acos(glm::dvec3(0,0,1).dot(ray.direction))/M_PI);
+      u = (acos(ray.direction.y)/ M_PI);
+      return bg.get_pixel(fabs(u), fabs(v))*1.2;
+  }*/
+
+  if (isct.m.get_type() == EMIT)
+    return isct.m.get_emission();
+  // glm::dvec3 x = ray.origin + ray.direction * isct.u;
+
+  glm::dvec3 colour = isct.m.get_colour();
+  // return colour * isct.n.dot((glm::dvec3(1,-3,8)-x).norm());
+
+  // Calculate max reflection
+  double p = colour.x > colour.y && colour.x > colour.z
+                 ? colour.x
+                 : colour.y > colour.z ? colour.y : colour.z;
+
+  // Russian roulette termination.
+  // If random number between 0 and 1 is > p, terminate and return hit object's
+  // emmission
+  double rnd = erand48(Xi);
+  if (++depth > 5) {
+    if (rnd <
+        p * 0.9) { // Multiply by 0.9 to avoid infinite loop with colours of 1.0
+      colour = colour * (0.9 / p);
+    } else {
+      return isct.m.get_emission();
+    }
+  }
+
+  glm::dvec3 x = ray.origin + ray.direction * isct.u;
+  Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, Xi);
+
+  return colour * (trace_ray(reflected, depth, Xi));
 }
 } // namespace path
 } // namespace rt

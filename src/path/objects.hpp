@@ -1,68 +1,58 @@
 #pragma once
 
-#include <optional>
-
-#include <glm/glm.hpp>
-
-#include "intersection.hpp"
 #include "kdtree.hpp"
 #include "material.hpp"
 #include "ray.hpp"
-#include "triangle.hpp"
-
 #include "third_party/tiny_obj_loader.hpp"
+#include "triangle.hpp"
 
 namespace rt {
 namespace path {
-class object {
-protected:
-  glm::vec3 m_position;
+struct ObjectIntersection {
+  bool hit;     // If there was an intersection
+  double u;     // Distance to intersection along ray
+  glm::dvec3 n; // Normal of intersected face
+  Material m;   // Material of intersected face
 
-public:
-  constexpr object(const glm::vec3& pos)
-      : m_position{pos} {
-  }
-
-  virtual std::optional<Intersection>
-  calculate_intersection(const rt::path::ray<float>& r) = 0;
+  ObjectIntersection(bool hit_ = false, double u_ = 0,
+                     glm::dvec3 n_ = glm::dvec3(), Material m_ = Material());
 };
 
-class sphere final : public object {
-private:
-  float m_radius;
-  rt::path::Material m_material;
+class Object {
 
 public:
-  sphere(const glm::vec3& pos, float radius, rt::path::Material mat);
-
-  inline float radius() const {
-    return m_radius;
-  }
-
-  inline rt::path::Material material() const {
-    return m_material;
-  }
-
-  virtual std::optional<Intersection>
-  calculate_intersection(const rt::path::ray<float>& r) override;
+  glm::dvec3 m_p; // Position
+  virtual ObjectIntersection get_intersection(const Ray& r) = 0;
 };
 
-class mesh final : public object {
-private:
-  std::vector<tinyobj::shape_t> m_tshapes;
-  std::vector<tinyobj::material_t> m_tmaterials;
-  std::vector<rt::path::Material> m_materials;
-  std::vector<rt::path::triangle*> m_triangles;
+class Sphere : public Object {
 
-  rt::path::Material m_material;
-  KDNode* m_node;
+private:
+  double m_r;   // Radius
+  Material m_m; // Material
 
 public:
-  mesh(const glm::vec3& position, const std::string& file_path,
-       rt::path::Material mat);
+  Sphere(glm::dvec3 p_, double r_, Material m_);
+  virtual double get_radius();
+  virtual Material get_material();
 
-  virtual std::optional<Intersection>
-  calculate_intersection(const rt::path::ray<float>& r) override;
+  virtual ObjectIntersection get_intersection(const Ray& r);
+};
+
+class Mesh : public Object {
+
+private:
+  std::vector<tinyobj::shape_t> m_shapes;
+  std::vector<tinyobj::material_t> m_materials;
+  std::vector<Material> materials;
+  std::vector<Triangle*> tris;
+  Material m_m; // Material
+  KDNode* node;
+  // BVH bvh;
+
+public:
+  Mesh(glm::dvec3 p_, const char* file_path, Material m_);
+  virtual ObjectIntersection get_intersection(const Ray& r);
 };
 } // namespace path
 } // namespace rt

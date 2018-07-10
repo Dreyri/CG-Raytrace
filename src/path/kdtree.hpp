@@ -1,32 +1,25 @@
 #pragma once
 
 #include <vector>
-#include <optional>
 
-#include "aabb.hpp"
+#include "ray.hpp"
 #include "triangle.hpp"
 
 namespace rt {
 namespace path {
-struct KDNode {
 
-  AABB box{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)};
-  KDNode* left{nullptr};
-  KDNode* right{nullptr};
+class KDNode {
+public:
+  AABBox box;
+  KDNode* left;
+  KDNode* right;
+  std::vector<Triangle*> triangles;
+  bool leaf;
 
-  std::vector<triangle*> triangles;
-  bool leaf{false};
-
-  KDNode() = default;;
-
-  static KDNode* build(const std::vector<triangle*>& tris, int depth);
-
-  /**
-   * if hit occurs optional contains
-   * distance, color, normal
-   */
-  std::optional<std::tuple<float, glm::vec4, glm::vec3>> hit(const rt::path::ray<float>& r, float tmin);
-
+  KDNode(){};
+  KDNode* build(std::vector<Triangle*>& tris, int depth);
+  bool hit(KDNode* node, const Ray& ray, double& t, double& tmin,
+           glm::dvec3& normal, glm::dvec3& c);
 };
 } // namespace path
 } // namespace rt
