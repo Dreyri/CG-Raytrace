@@ -1,7 +1,6 @@
 add_executable(example
                example.cpp)
-target_include_directories(example PRIVATE ${ASSIMP_INCLUDE_DIRS})
-target_link_libraries(example PRIVATE ${ASSIMP_LIBRARIES} glm Qt5::Gui rtcore)
+target_link_libraries(example PRIVATE glm Qt5::Gui rtcore)
 
 add_executable(rt
 			   main.cpp
@@ -37,5 +36,6 @@ add_library(rtcore
 			core/scene.hpp
 			core/defs.hpp			
 			core/sphere.cpp
-			core/sphere.hpp)
+			core/sphere.hpp
+			core/tiny_obj_loader.hpp)
 target_link_libraries(rtcore PRIVATE glm)

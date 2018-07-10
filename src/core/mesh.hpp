@@ -39,5 +39,6 @@ namespace rt
         static Mesh getUnityCube();
         static Mesh getUnitySphere();
         static Mesh getXZPlane();
+        static Mesh getObj(std::string file);
     };
 }

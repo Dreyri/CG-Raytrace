@@ -1,5 +1,9 @@
 #include "mesh.hpp"
 
+#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+#include "tiny_obj_loader.hpp"
+
+#include <iostream>
 #include <unordered_map>
 
 using namespace rt;
@@ -83,9 +87,9 @@ Mesh Mesh::getUnityCube()
         mesh.polygons.push_back(polygon);
     }
 
-    Mesh::unityCube = mesh;
-
     mesh.type = MeshType::unityCube;
+
+    Mesh::unityCube = mesh;
     return mesh;
 }
 
@@ -217,9 +221,9 @@ Mesh Mesh::getUnitySphere()
         mesh.polygons.push_back(polygon);
     }
 
-    Mesh::unitySphere = mesh;
-
     mesh.type = MeshType::unitySphere;
+
+    Mesh::unitySphere = mesh;    
     return mesh;
 }
 
@@ -279,6 +283,94 @@ Mesh rt::Mesh::getXZPlane()
         polygon.material = nullptr;
 
         mesh.polygons.push_back(polygon);
+    }
+
+    mesh.type = MeshType::noBounding;
+    return mesh;
+}
+
+Mesh Mesh::getObj(std::string file)
+{
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+
+    std::string err;
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, file.c_str());
+
+    if (!err.empty()) { // `err` may contain warning message.
+        std::cout << err << std::endl;
+    }
+
+    if (!ret) {
+        exit(1);
+    }
+
+    Mesh mesh = Mesh();
+
+    // Loop over shapes
+    for (size_t s = 0; s < shapes.size(); s++) 
+    {
+        // Loop over faces(polygon)
+        size_t index_offset = 0;
+        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) 
+        {
+            int fv = 3;
+            Polygon polygon = Polygon();
+
+            tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + 0];
+            polygon.v1 = {
+                attrib.vertices[3 * idx.vertex_index + 0],
+                attrib.vertices[3 * idx.vertex_index + 1],
+                attrib.vertices[3 * idx.vertex_index + 2]
+            };
+            polygon.n1 = {
+                attrib.normals[3 * idx.normal_index + 0],
+                attrib.normals[3 * idx.normal_index + 1],
+                attrib.normals[3 * idx.normal_index + 2]
+            };
+            polygon.uv1 = {
+                attrib.texcoords[2 * idx.texcoord_index + 0],
+                attrib.texcoords[2 * idx.texcoord_index + 1]
+            };
+
+            idx = shapes[s].mesh.indices[index_offset + 1];
+            polygon.v2 = {
+                attrib.vertices[3 * idx.vertex_index + 0],
+                attrib.vertices[3 * idx.vertex_index + 1],
+                attrib.vertices[3 * idx.vertex_index + 2]
+            };
+            polygon.n2 = {
+                attrib.normals[3 * idx.normal_index + 0],
+                attrib.normals[3 * idx.normal_index + 1],
+                attrib.normals[3 * idx.normal_index + 2]
+            };
+            polygon.uv2 = {
+                attrib.texcoords[2 * idx.texcoord_index + 0],
+                attrib.texcoords[2 * idx.texcoord_index + 1]
+            };
+
+            idx = shapes[s].mesh.indices[index_offset + 2];
+            polygon.v3 = {
+                attrib.vertices[3 * idx.vertex_index + 0],
+                attrib.vertices[3 * idx.vertex_index + 1],
+                attrib.vertices[3 * idx.vertex_index + 2]
+            };
+            polygon.n3 = {
+                attrib.normals[3 * idx.normal_index + 0],
+                attrib.normals[3 * idx.normal_index + 1],
+                attrib.normals[3 * idx.normal_index + 2]
+            };
+            polygon.uv3 = {
+                attrib.texcoords[2 * idx.texcoord_index + 0],
+                attrib.texcoords[2 * idx.texcoord_index + 1]
+            };
+
+            index_offset += fv;
+
+            polygon.material = nullptr;
+            mesh.polygons.push_back(polygon);
+        }
     }
 
     mesh.type = MeshType::noBounding;

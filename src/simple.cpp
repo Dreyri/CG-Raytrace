@@ -82,12 +82,12 @@ void SimpleScene1::render(QImage& target)
 void SimpleScene2::setup()
 {
     this->tracer = rt::RaytracerSimple();
-    this->tracer.numThreads = 1;
+    this->tracer.numThreads = 4;
     this->scene = std::make_shared<rt::Scene>(rt::Scene());
     tracer.scene = this->scene;
 
     rt::Camera cam = rt::Camera();
-    cam.position = rt::vec3(10.0, 4.0, 0.0);
+    cam.position = rt::vec3(10.0, 3.5, 0.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.fov = 90;
 
@@ -138,9 +138,8 @@ void SimpleScene2::setup()
     //scene->objects.push_back(box1);
 
     rt::Object sphere1 = rt::Object(rt::Mesh::getUnitySphere(), bronze);
-    sphere1.setPosition({ 0.0, 0.0, -4.0 });
+    sphere1.setPosition({ 0.0, 2.0, -4.0 });
     sphere1.setScale({ 2.0, 2.0, 2.0 });
-    sphere1.setRotation(-20.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(sphere1);
 
     rt::Object planeXZ = rt::Object(rt::Mesh::getXZPlane(), checkerdTex);
@@ -152,8 +151,13 @@ void SimpleScene2::setup()
     glass1.setPosition({ 5.0, 2.0, 3.0 });
     glass1.setScale({ 2.0, 2.0, 2.0 });
     //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
-    //scene->objects.push_back(glass1);
+    scene->objects.push_back(glass1);
 
+    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot1.obj"), bronze);
+    teapot.setPosition({ 5.5, 0.5, -4.0 });
+    teapot.setScale({ 0.12, 0.12, 0.12 });
+    teapot.setRotation(glm::radians(45.0), {0.0, 1.0, 0.0});
+    scene->objects.push_back(teapot);
 
     this->timer.start();
     this->frameCount = 0;
@@ -169,7 +173,15 @@ void SimpleScene2::transform(unsigned int depth, float adaptive, bool smoothing,
     tracer.reflection = reflection;
     tracer.refraction = refraction;
 
-    //if (animation)
+    if (animation)
+    {
+        double boxRot = (ulong)(0.01 * this->timer.elapsed()) % 360;
+        tracer.scene->objects[1].setRotation(glm::radians(boxRot), { 0.0, 1.0, 0.0 });
+    }
+    else
+    {
+        tracer.scene->objects[1].setRotation(glm::radians((double)slider), { 0.0, 1.0, 0.0 });
+    }
 
     tracer.scene->transform();
 }

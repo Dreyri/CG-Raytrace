@@ -14,6 +14,7 @@ Renderboy::~Renderboy()
 void Renderboy::run()
 {
     SimpleScene2 sc1 = SimpleScene2();
+    //SimpleScene1 sc1 = SimpleScene1();
 
     sc1.setup();
     

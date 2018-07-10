@@ -7,8 +7,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(assimp REQUIRED)
 find_package(glm REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 add_subdirectory(src)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/teapot1.obj DESTINATION ${CMAKE_BINARY_DIR}/src/Release)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/teapot1.obj DESTINATION ${CMAKE_BINARY_DIR}/src/Debug)
