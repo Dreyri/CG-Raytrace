@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Renderboy::Renderboy() : camH{0}, camV{0}, ri{1.5}, depth{8}, winW{640}, winH{480}
+Renderboy::Renderboy() : camH{0}, camV{0}, ri{1.5}, depth{8}, winW{640}, winH{480}, smoothing{true}, reflection{true}, refraction{true}, animate{false}, adaptive{0.05f}
 {
 }
 

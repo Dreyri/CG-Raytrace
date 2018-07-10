@@ -87,7 +87,7 @@ void SimpleScene2::setup()
     tracer.scene = this->scene;
 
     rt::Camera cam = rt::Camera();
-    cam.position = rt::vec3(9.0, 4, 0.0);
+    cam.position = rt::vec3(9, 4, -1.0);
     cam.direction = glm::normalize(rt::vec3(0.0, 0.0, 0.0) - cam.position); // Look at {0.0, 0.0, 0.0}
     cam.fov = 90;
 
@@ -132,14 +132,14 @@ void SimpleScene2::setup()
     checkerdTex->reflection_amount = 0.0;
     checkerdTex->transparent = false;
 
-    ImageTexture* mT = new ImageTexture(QImage("jade1.jpg"));
-    std::shared_ptr<rt::TextureMaterial> metalTex = std::make_shared<rt::TextureMaterial>(mT);
-    metalTex->ambient = 0.2;
-    metalTex->diffuse = 0.3;
-    metalTex->specular = 0.6;
-    metalTex->shininess = 15.0;
-    metalTex->reflection_amount = 0.4;
-    metalTex->transparent = false;
+    ImageTexture* mT = new ImageTexture(QImage("coloredNumGrid.jpg"));
+    std::shared_ptr<rt::TextureMaterial> colorGridTex = std::make_shared<rt::TextureMaterial>(mT);
+    colorGridTex->ambient = 0.3;
+    colorGridTex->diffuse = 0.6;
+    colorGridTex->specular = 0.6;
+    colorGridTex->shininess = 5.0;
+    colorGridTex->reflection_amount = 0.15;
+    colorGridTex->transparent = false;
 
     rt::Object box1 = rt::Object(rt::Mesh::getUnityCube(), bronze);
     box1.setPosition({ 0.0, -2.0, 0.0 });
@@ -163,7 +163,7 @@ void SimpleScene2::setup()
     //glass1.setRotation(0.0, { 0.0, 1.0, 0.0 });
     scene->objects.push_back(glass1);
 
-    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot2.obj"), checkerdTex);
+    rt::Object teapot = rt::Object(rt::Mesh::getObj("teapot1.obj"), colorGridTex);
     teapot.setPosition({ 5.5, 0.5, -4.0 });
     teapot.setScale({ 0.12, 0.12, 0.12 });
     teapot.setRotation(glm::radians(225.0), {0.0, 1.0, 0.0});
